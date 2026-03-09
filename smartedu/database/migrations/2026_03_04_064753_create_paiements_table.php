@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('paiements', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('etudiant_id')->constrained('etudiants')->onDelete('cascade');
+            $table->decimal('montant', 10, 2);
+            $table->date('date');
+            $table->string('statut');
+            $table->string('methode');
+            $table->string('type');
             $table->timestamps();
         });
     }

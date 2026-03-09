@@ -6,23 +6,21 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreEtudiantRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'utilisateur_id' => ['required', 'integer', 'exists:users,id', 'unique:etudiants,utilisateur_id'],
+            'matricule' => ['required', 'string', 'max:50', 'unique:etudiants,matricule'],
+            'date_naissance' => ['nullable', 'date'],
+            'classe_id' => ['nullable', 'integer', 'exists:classes,id'],
         ];
     }
 }

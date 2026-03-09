@@ -3,63 +3,48 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enseignant;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreEnseignantRequest;
+use App\Http\Requests\UpdateEnseignantRequest;
 
 class EnseignantController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $enseignants = Enseignant::with('user')->paginate(15);
+        return view('enseignants.index', compact('enseignants'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('enseignants.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreEnseignantRequest $request)
     {
-        //
+        Enseignant::create($request->validated());
+        return redirect()->route('enseignants.index')->with('success', 'Enseignant créé avec succès.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Enseignant $enseignant)
     {
-        //
+        $enseignant->load(['user', 'cours']);
+        return view('enseignants.show', compact('enseignant'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Enseignant $enseignant)
     {
-        //
+        return view('enseignants.edit', compact('enseignant'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Enseignant $enseignant)
+    public function update(UpdateEnseignantRequest $request, Enseignant $enseignant)
     {
-        //
+        $enseignant->update($request->validated());
+        return redirect()->route('enseignants.index')->with('success', 'Enseignant mis à jour avec succès.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Enseignant $enseignant)
     {
-        //
+        $enseignant->delete();
+        return redirect()->route('enseignants.index')->with('success', 'Enseignant supprimé avec succès.');
     }
 }

@@ -3,63 +3,62 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paiement;
-use Illuminate\Http\Request;
+use App\Models\Etudiant;
+use App\Models\Cours;
+use App\Http\Requests\StorePaiementRequest;
+use App\Http\Requests\UpdatePaiementRequest;
 
 class PaiementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $paiements = Paiement::with(['etudiant.user', 'cours'])->paginate(15);
+        return view('paiements.index', compact('paiements'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
+        $cours = Cours::orderBy('titre')->get();
+        return view('paiements.create', compact('etudiants', 'cours'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StorePaiementRequest $request)
     {
-        //
+        $data = $request->validated();
+        if (($data['type'] ?? '') === 'scolarite') {
+            $data['cours_id'] = null;
+        }
+        Paiement::create($data);
+        return redirect()->route('paiements.index')->with('success', 'Paiement enregistré avec succès.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Paiement $paiement)
     {
-        //
+        $paiement->load(['etudiant.user', 'cours']);
+        return view('paiements.show', compact('paiement'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Paiement $paiement)
     {
-        //
+        $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
+        $cours = Cours::orderBy('titre')->get();
+        return view('paiements.edit', compact('paiement', 'etudiants', 'cours'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Paiement $paiement)
+    public function update(UpdatePaiementRequest $request, Paiement $paiement)
     {
-        //
+        $data = $request->validated();
+        if (($data['type'] ?? '') === 'scolarite') {
+            $data['cours_id'] = null;
+        }
+        $paiement->update($data);
+        return redirect()->route('paiements.index')->with('success', 'Paiement mis à jour avec succès.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Paiement $paiement)
     {
-        //
+        $paiement->delete();
+        return redirect()->route('paiements.index')->with('success', 'Paiement supprimé avec succès.');
     }
 }

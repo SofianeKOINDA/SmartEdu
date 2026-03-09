@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('cours', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('nom');
+            $table->text('description');
+            $table->string('type');
+            $table->foreignId('enseignant_id')->constrained('enseignants')->onDelete('cascade');
         });
     }
 

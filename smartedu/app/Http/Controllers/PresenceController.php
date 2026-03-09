@@ -3,63 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Models\Presence;
-use Illuminate\Http\Request;
+use App\Models\Etudiant;
+use App\Models\Cours;
+use App\Http\Requests\StorePresenceRequest;
+use App\Http\Requests\UpdatePresenceRequest;
 
 class PresenceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $presences = Presence::with(['etudiant.user', 'cours'])->paginate(15);
+        return view('presences.index', compact('presences'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
+        $cours = Cours::orderBy('titre')->get();
+        return view('presences.create', compact('etudiants', 'cours'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StorePresenceRequest $request)
     {
-        //
+        Presence::create($request->validated());
+        return redirect()->route('presences.index')->with('success', 'Présence enregistrée avec succès.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Presence $presence)
     {
-        //
+        $presence->load(['etudiant.user', 'cours']);
+        return view('presences.show', compact('presence'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Presence $presence)
     {
-        //
+        $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
+        $cours = Cours::orderBy('titre')->get();
+        return view('presences.edit', compact('presence', 'etudiants', 'cours'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Presence $presence)
+    public function update(UpdatePresenceRequest $request, Presence $presence)
     {
-        //
+        $presence->update($request->validated());
+        return redirect()->route('presences.index')->with('success', 'Présence mise à jour avec succès.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Presence $presence)
     {
-        //
+        $presence->delete();
+        return redirect()->route('presences.index')->with('success', 'Présence supprimée avec succès.');
     }
 }

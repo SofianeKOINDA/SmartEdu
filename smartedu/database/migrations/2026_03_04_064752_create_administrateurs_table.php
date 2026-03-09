@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('administrateurs', function (Blueprint $table) {
+       Schema::create('administrateurs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('departement');
+            $table->string('telephone');
+            $table->string('matricule_administrateur')->unique();
             $table->timestamps();
-        });
+});
     }
 
     /**

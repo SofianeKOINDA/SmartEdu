@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cours_id')->constrained('cours')->onDelete('cascade');
+            $table->string('titre');
+            $table->string('type');
+            $table->text('description')->nullable();
+            $table->dateTime('date_limite');
+            $table->decimal('coefficient');
             $table->timestamps();
         });
     }

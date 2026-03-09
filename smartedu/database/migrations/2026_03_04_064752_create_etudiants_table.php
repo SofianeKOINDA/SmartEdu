@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('etudiants', function (Blueprint $table) {
+       Schema::create('etudiants', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('matricule')->unique();
+            $table->date('date_naissance')->nullable();
+            $table->foreignId('classe_id')->nullable()->constrained('classes')->onDelete('set null');
             $table->timestamps();
-        });
+});
     }
 
     /**
