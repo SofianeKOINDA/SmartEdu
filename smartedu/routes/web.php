@@ -16,15 +16,52 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Utilisateurs (table users) — utilise UtilisateurController
-Route::resource('users', UtilisateurController::class);
+// ─── Dashboards par rôle ──────────────────────────────────────────────────────
+Route::get('/admin/dashboard',      [AdministrateurController::class, 'dashboard'])->name('admin.dashboard');
+Route::get('/enseignant/dashboard', [EnseignantController::class,     'dashboard'])->name('enseignant.dashboard');
+Route::get('/etudiant/dashboard',   [EtudiantController::class,       'dashboard'])->name('etudiant.dashboard');
 
-Route::resource('administrateurs', AdministrateurController::class);
-Route::resource('classes', ClasseController::class);
-Route::resource('enseignants', EnseignantController::class);
-Route::resource('etudiants', EtudiantController::class);
-Route::resource('cours', CoursController::class);
-Route::resource('evaluations', EvaluationController::class);
-Route::resource('notes', NoteController::class);
-Route::resource('presences', PresenceController::class);
-Route::resource('paiements', PaiementController::class);
+// ─── Profil étudiant ──────────────────────────────────────────────────────────
+Route::put('/etudiant/profil', [EtudiantController::class, 'updateProfil'])->name('etudiant.profil.update');
+
+// ─── CRUD via modals (pas de routes create/edit) ──────────────────────────────
+
+// Utilisateurs
+Route::resource('users', UtilisateurController::class)
+    ->only(['index', 'store', 'update', 'destroy']);
+
+// Administrateurs
+Route::resource('administrateurs', AdministrateurController::class)
+    ->only(['store', 'update', 'destroy']);
+
+// Classes
+Route::resource('classes', ClasseController::class)
+    ->only(['index', 'show', 'store', 'update', 'destroy']);
+
+// Enseignants
+Route::resource('enseignants', EnseignantController::class)
+    ->only(['index', 'store', 'update', 'destroy']);
+
+// Étudiants
+Route::resource('etudiants', EtudiantController::class)
+    ->only(['index', 'store', 'update', 'destroy']);
+
+// Cours
+Route::resource('cours', CoursController::class)
+    ->only(['index', 'show', 'store', 'update', 'destroy']);
+
+// Évaluations
+Route::resource('evaluations', EvaluationController::class)
+    ->only(['index', 'show', 'store', 'update', 'destroy']);
+
+// Notes
+Route::resource('notes', NoteController::class)
+    ->only(['index', 'store', 'update', 'destroy']);
+
+// Présences
+Route::resource('presences', PresenceController::class)
+    ->only(['index', 'store', 'update', 'destroy']);
+
+// Paiements
+Route::resource('paiements', PaiementController::class)
+    ->only(['index', 'store', 'update', 'destroy']);

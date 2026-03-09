@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Etudiant extends Model
+class Etudiant extends User
 {
+    use HasFactory;
+
     protected $table = 'etudiants';
 
     protected $fillable = [
@@ -34,16 +37,16 @@ class Etudiant extends Model
 
     public function notes()
     {
-        return $this->hasMany(Note::class, 'etudiant_id');
+        return $this->hasMany(Note::class, 'etudiant_matricule', 'matricule');
     }
 
     public function presences()
     {
-        return $this->hasMany(Presence::class, 'etudiant_id');
+        return $this->hasMany(Presence::class, 'etudiant_matricule', 'matricule');
     }
 
     public function paiements()
     {
-        return $this->hasMany(Paiement::class, 'etudiant_id');
+        return $this->hasMany(Paiement::class, 'etudiant_matricule', 'matricule');
     }
 }

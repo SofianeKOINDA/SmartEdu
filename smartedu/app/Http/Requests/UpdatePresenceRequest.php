@@ -11,16 +11,13 @@ class UpdatePresenceRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'etudiant_id' => ['required', 'integer', 'exists:etudiants,id'],
-            'cours_id' => ['required', 'integer', 'exists:cours,id'],
-            'date' => ['required', 'date'],
-            'statut' => ['required', 'in:present,absent,retard,justifie'],
+            'etudiant_matricule' => ['sometimes', 'string', 'exists:etudiants,matricule'],
+            'cours_id'           => ['sometimes', 'integer', 'exists:cours,id'],
+            'date'               => ['sometimes', 'date'],
+            'statut'             => ['sometimes', 'in:present,absent,retard,justifie'],
         ];
     }
 }

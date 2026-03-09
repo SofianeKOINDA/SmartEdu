@@ -9,7 +9,7 @@ class Presence extends Model
     protected $table = 'presences';
 
     protected $fillable = [
-        'etudiant_id',
+        'etudiant_matricule',
         'cours_id',
         'date',
         'statut',
@@ -24,7 +24,7 @@ class Presence extends Model
 
     public function etudiant()
     {
-        return $this->belongsTo(Etudiant::class, 'etudiant_id');
+        return $this->belongsTo(Etudiant::class, 'etudiant_matricule', 'matricule');
     }
 
     public function cours()

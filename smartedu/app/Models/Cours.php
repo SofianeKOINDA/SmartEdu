@@ -10,14 +10,14 @@ class Cours extends Model
 
     protected $fillable = [
         'titre',
-        'enseignant_id',
+        'enseignant_matricule',
         'type',
         'description',
     ];
 
     public function enseignant()
     {
-        return $this->belongsTo(Enseignant::class, 'enseignant_id');
+        return $this->belongsTo(Enseignant::class, 'enseignant_matricule', 'matricule_enseignant');
     }
 
     public function classes()
@@ -33,10 +33,5 @@ class Cours extends Model
     public function presences()
     {
         return $this->hasMany(Presence::class, 'cours_id');
-    }
-
-    public function paiements()
-    {
-        return $this->hasMany(Paiement::class, 'cours_id');
     }
 }

@@ -11,16 +11,13 @@ class UpdateCoursRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'titre' => ['required', 'string', 'max:200'],
-            'enseignant_id' => ['required', 'integer', 'exists:enseignants,id'],
-            'type' => ['required', 'in:presentiel,en_ligne,hybride'],
-            'description' => ['nullable', 'string'],
+            'titre'               => ['sometimes', 'string', 'max:200'],
+            'enseignant_matricule'=> ['sometimes', 'string', 'exists:enseignants,matricule_enseignant'],
+            'type'                => ['sometimes', 'in:presentiel,en_ligne,hybride'],
+            'description'         => ['sometimes', 'nullable', 'string'],
         ];
     }
 }

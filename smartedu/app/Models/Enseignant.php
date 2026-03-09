@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Enseignant extends Model
+class Enseignant extends User
 {
+    use HasFactory;
+
     protected $table = 'enseignants';
 
     protected $fillable = [
@@ -22,6 +25,6 @@ class Enseignant extends Model
 
     public function cours()
     {
-        return $this->hasMany(Cours::class, 'enseignant_id');
+        return $this->hasMany(Cours::class, 'enseignant_matricule', 'matricule_enseignant');
     }
 }

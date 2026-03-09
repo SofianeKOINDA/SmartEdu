@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Administrateur extends Model
+class Administrateur extends User
 {
+    use HasFactory;
+
     protected $table = 'administrateurs';
 
     protected $fillable = [

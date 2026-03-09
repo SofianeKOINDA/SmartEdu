@@ -11,17 +11,14 @@ class UpdateNoteRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'etudiant_id' => ['required', 'integer', 'exists:etudiants,id'],
-            'evaluation_id' => ['required', 'integer', 'exists:evaluations,id'],
-            'valeur' => ['required', 'numeric', 'min:0', 'max:999.99'],
-            'commentaire' => ['nullable', 'string'],
-            'semestre' => ['required', 'in:S1,S2,S3,S4,S5,S6'],
+            'etudiant_matricule' => ['sometimes', 'string', 'exists:etudiants,matricule'],
+            'evaluation_id'      => ['sometimes', 'integer', 'exists:evaluations,id'],
+            'valeur'             => ['sometimes', 'numeric', 'min:0', 'max:20'],
+            'commentaire'        => ['sometimes', 'nullable', 'string'],
+            'semestre'           => ['sometimes', 'in:S1,S2,S3,S4,S5,S6'],
         ];
     }
 }

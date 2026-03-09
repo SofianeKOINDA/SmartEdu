@@ -11,16 +11,22 @@ class StoreCoursRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'titre' => ['required', 'string', 'max:200'],
-            'enseignant_id' => ['required', 'integer', 'exists:enseignants,id'],
-            'type' => ['required', 'in:presentiel,en_ligne,hybride'],
-            'description' => ['nullable', 'string'],
+            'titre'               => ['required', 'string', 'max:200'],
+            'enseignant_matricule'=> ['required', 'string', 'exists:enseignants,matricule_enseignant'],
+            'type'                => ['required', 'in:presentiel,en_ligne,hybride'],
+            'description'         => ['nullable', 'string'],
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'titre.required' => 'Le titre du cours est requis.',
+            'enseignant_matricule.required' => 'Le matricule de l\'enseignant est requis.',
+            'type.required' => 'Le type de cours est requis.',
+            'type.in' => 'Le type de cours doit être présentiel, en ligne ou hybride.',
         ];
     }
 }

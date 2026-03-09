@@ -9,7 +9,7 @@ class Note extends Model
     protected $table = 'notes';
 
     protected $fillable = [
-        'etudiant_id',
+        'etudiant_matricule',
         'evaluation_id',
         'valeur',
         'commentaire',
@@ -25,7 +25,7 @@ class Note extends Model
 
     public function etudiant()
     {
-        return $this->belongsTo(Etudiant::class, 'etudiant_id');
+        return $this->belongsTo(Etudiant::class, 'etudiant_matricule', 'matricule');
     }
 
     public function evaluation()

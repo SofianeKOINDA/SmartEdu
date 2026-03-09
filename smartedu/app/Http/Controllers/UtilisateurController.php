@@ -5,51 +5,57 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UtilisateurController extends Controller
 {
+    /**
+     * Liste de tous les utilisateurs (admin seulement).
+     */
     public function index()
     {
-        $users = User::with(['etudiant', 'enseignant', 'administrateur'])->paginate(15);
-        return view('users.index', compact('users'));
+        $users = User::with(['etudiant', 'enseignant', 'administrateur'])
+            ->orderBy('role')
+            ->paginate(20);
+        return view('pages.admin.utilisateurs', compact('users'));
     }
 
-    public function create()
-    {
-        return view('users.create');
-    }
-
+    /**
+     * Créer un utilisateur simple via modal (sans profil associé).
+     */
     public function store(StoreUserRequest $request)
     {
-        User::create($request->validated());
-        return redirect()->route('users.index')->with('success', 'Utilisateur créé avec succès.');
+        User::create([
+            'nom'      => $request->nom,
+            'prenom'   => $request->prenom,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => $request->role,
+        ]);
+        return redirect()->back()->with('success', 'Utilisateur créé avec succès.');
     }
 
-    public function show(User $user)
-    {
-        $user->load(['etudiant', 'enseignant', 'administrateur']);
-        return view('users.show', compact('user'));
-    }
-
-    public function edit(User $user)
-    {
-        return view('users.edit', compact('user'));
-    }
-
+    /**
+     * Mettre à jour un utilisateur via modal.
+     */
     public function update(UpdateUserRequest $request, User $user)
     {
-        $validated = $request->validated();
-        if (empty($validated['password'])) {
-            unset($validated['password']);
+        $data = $request->validated();
+        if (empty($data['password'])) {
+            unset($data['password']);
+        } else {
+            $data['password'] = Hash::make($data['password']);
         }
-        $user->update($validated);
-        return redirect()->route('users.index')->with('success', 'Utilisateur mis à jour avec succès.');
+        $user->update($data);
+        return redirect()->back()->with('success', 'Utilisateur mis à jour avec succès.');
     }
 
+    /**
+     * Supprimer un utilisateur via modal.
+     */
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'Utilisateur supprimé avec succès.');
+        return redirect()->back()->with('success', 'Utilisateur supprimé avec succès.');
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StorePaiementRequest extends FormRequest
 {
@@ -12,25 +11,26 @@ class StorePaiementRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'etudiant_id' => ['required', 'integer', 'exists:etudiants,id'],
-            'cours_id' => [
-                'nullable',
-                Rule::requiredIf(fn () => $this->input('type') === 'inscription_cours'),
-                Rule::prohibitedIf(fn () => $this->input('type') === 'scolarite'),
-                'integer',
-                'exists:cours,id',
-            ],
-            'montant' => ['required', 'numeric', 'min:0'],
-            'date' => ['required', 'date'],
-            'statut' => ['required', 'in:en_attente,valide,refuse,rembourse'],
-            'methode' => ['required', 'in:especes,virement,carte,mobile_money'],
-            'type' => ['required', 'in:scolarite,inscription_cours'],
+            'etudiant_matricule' => ['required', 'string', 'exists:etudiants,matricule'],
+            'montant'            => ['required', 'numeric', 'min:0'],
+            'date'               => ['required', 'date'],
+            'statut'             => ['required', 'in:en_attente,valide,refuse,rembourse'],
+            'methode'            => ['required', 'in:especes,virement,carte,mobile_money'],
+            'type'               => ['required', 'in:scolarite,inscription'],
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'etudiant_matricule.required' => 'Le matricule de l\'étudiant est requis.',
+            'montant.required' => 'Le montant est requis.',
+            'date.required' => 'La date est requise.',
+            'statut.required' => 'Le statut est requis.',
+            'methode.required' => 'La méthode de paiement est requise.',
+            'type.required' => 'Le type de paiement est requis.',
         ];
     }
 }

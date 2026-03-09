@@ -9,7 +9,7 @@ class Paiement extends Model
     protected $table = 'paiements';
 
     protected $fillable = [
-        'etudiant_id',
+        'etudiant_matricule',
         'montant',
         'date',
         'statut',
@@ -20,14 +20,13 @@ class Paiement extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'date',
+            'date'    => 'date',
             'montant' => 'decimal:2',
         ];
     }
 
     public function etudiant()
     {
-        return $this->belongsTo(Etudiant::class, 'etudiant_id');
+        return $this->belongsTo(Etudiant::class, 'etudiant_matricule', 'matricule');
     }
-
 }

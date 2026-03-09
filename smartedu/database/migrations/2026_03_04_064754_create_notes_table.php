@@ -6,14 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('notes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('etudiant_id')->constrained('etudiants')->onDelete('cascade');
+            $table->string('etudiant_matricule');
+            $table->foreign('etudiant_matricule')->references('matricule')->on('etudiants')->onDelete('cascade');
             $table->foreignId('evaluation_id')->constrained('evaluations')->onDelete('cascade');
             $table->decimal('valeur', 5, 2);
             $table->text('commentaire')->nullable();
@@ -22,9 +20,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('notes');

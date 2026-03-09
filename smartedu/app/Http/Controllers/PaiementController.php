@@ -4,61 +4,58 @@ namespace App\Http\Controllers;
 
 use App\Models\Paiement;
 use App\Models\Etudiant;
-use App\Models\Cours;
 use App\Http\Requests\StorePaiementRequest;
 use App\Http\Requests\UpdatePaiementRequest;
+use Illuminate\Support\Facades\Auth;
 
 class PaiementController extends Controller
 {
+    /**
+     * Liste des paiements — admin voit tout, étudiant voit les siens.
+     */
     public function index()
     {
-        $paiements = Paiement::with(['etudiant.user', 'cours'])->paginate(15);
-        return view('paiements.index', compact('paiements'));
+        $user = Auth::user();
+
+        if ($user->role === 'etudiant') {
+            $paiements = $user->etudiant->paiements()
+                ->orderBy('date', 'desc')
+                ->paginate(15);
+            $etudiants = collect();
+        } else {
+            $paiements = Paiement::with('etudiant.user')
+                ->orderBy('date', 'desc')
+                ->paginate(15);
+            $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
+        }
+
+        return view('pages.admin.paiements', compact('paiements', 'etudiants'));
     }
 
-    public function create()
-    {
-        $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
-        $cours = Cours::orderBy('titre')->get();
-        return view('paiements.create', compact('etudiants', 'cours'));
-    }
-
+    /**
+     * Enregistrer un paiement via modal (admin).
+     */
     public function store(StorePaiementRequest $request)
     {
-        $data = $request->validated();
-        if (($data['type'] ?? '') === 'scolarite') {
-            $data['cours_id'] = null;
-        }
-        Paiement::create($data);
-        return redirect()->route('paiements.index')->with('success', 'Paiement enregistré avec succès.');
+        Paiement::create($request->validated());
+        return redirect()->back()->with('success', 'Paiement enregistré avec succès.');
     }
 
-    public function show(Paiement $paiement)
-    {
-        $paiement->load(['etudiant.user', 'cours']);
-        return view('paiements.show', compact('paiement'));
-    }
-
-    public function edit(Paiement $paiement)
-    {
-        $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
-        $cours = Cours::orderBy('titre')->get();
-        return view('paiements.edit', compact('paiement', 'etudiants', 'cours'));
-    }
-
+    /**
+     * Modifier un paiement via modal (admin).
+     */
     public function update(UpdatePaiementRequest $request, Paiement $paiement)
     {
-        $data = $request->validated();
-        if (($data['type'] ?? '') === 'scolarite') {
-            $data['cours_id'] = null;
-        }
-        $paiement->update($data);
-        return redirect()->route('paiements.index')->with('success', 'Paiement mis à jour avec succès.');
+        $paiement->update($request->validated());
+        return redirect()->back()->with('success', 'Paiement mis à jour avec succès.');
     }
 
+    /**
+     * Supprimer un paiement via modal (admin).
+     */
     public function destroy(Paiement $paiement)
     {
         $paiement->delete();
-        return redirect()->route('paiements.index')->with('success', 'Paiement supprimé avec succès.');
+        return redirect()->back()->with('success', 'Paiement supprimé avec succès.');
     }
 }

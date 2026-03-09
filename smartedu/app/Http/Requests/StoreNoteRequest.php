@@ -11,17 +11,23 @@ class StoreNoteRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'etudiant_id' => ['required', 'integer', 'exists:etudiants,id'],
-            'evaluation_id' => ['required', 'integer', 'exists:evaluations,id'],
-            'valeur' => ['required', 'numeric', 'min:0', 'max:999.99'],
-            'commentaire' => ['nullable', 'string'],
-            'semestre' => ['required', 'in:S1,S2,S3,S4,S5,S6'],
+            'etudiant_matricule' => ['required', 'string', 'exists:etudiants,matricule'],
+            'evaluation_id'      => ['required', 'integer', 'exists:evaluations,id'],
+            'valeur'             => ['required', 'numeric', 'min:0', 'max:20'],
+            'commentaire'        => ['nullable', 'string'],
+            'semestre'           => ['required', 'in:S1,S2,S3,S4,S5,S6'],
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'etudiant_matricule.required' => 'Le matricule de l\'étudiant est requis.',
+            'evaluation_id.required' => 'L\'ID de l\'évaluation est requis.',
+            'valeur.required' => 'La valeur de la note est requise.',
+            'semestre.required' => 'Le semestre est requis.',
         ];
     }
 }
