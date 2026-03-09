@@ -61,7 +61,7 @@ class EnseignantController extends Controller
             ->with(['user', 'classe'])
             ->get();
 
-        return view('pages.enseignant.dashboard', compact(
+        return view('enseignant', compact(
             'enseignant', 'cours', 'classes', 'evaluations',
             'notesRecentes', 'presencesRecentes', 'etudiants'
         ));
@@ -75,7 +75,7 @@ class EnseignantController extends Controller
     public function index()
     {
         $enseignants = Enseignant::with(['user', 'cours'])->latest()->paginate(15);
-        return view('pages.admin.enseignants', compact('enseignants'));
+        return view('pages.admin.Enseignant.liste', compact('enseignants'));
     }
 
     /**

@@ -43,7 +43,7 @@ class PresenceController extends Controller
             $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
         }
 
-        return view('pages.enseignant.presences', compact('presences', 'cours', 'etudiants'));
+        return view('pages.admin.Presence.liste', compact('presences', 'cours', 'etudiants'));
     }
 
     /**

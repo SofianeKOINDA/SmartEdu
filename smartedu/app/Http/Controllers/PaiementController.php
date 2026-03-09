@@ -29,7 +29,7 @@ class PaiementController extends Controller
             $etudiants = Etudiant::with('user')->orderBy('matricule')->get();
         }
 
-        return view('pages.admin.paiements', compact('paiements', 'etudiants'));
+        return view('pages.admin.Paiement.liste', compact('paiements', 'etudiants'));
     }
 
     /**

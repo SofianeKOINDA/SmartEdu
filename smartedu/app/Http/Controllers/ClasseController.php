@@ -13,7 +13,7 @@ class ClasseController extends Controller
     {
         $classes = Classe::withCount('etudiants')->with('cours')->latest()->paginate(15);
         $cours   = Cours::orderBy('titre')->get(); // pour le modal d'assignation de cours
-        return view('pages.admin.classes', compact('classes', 'cours'));
+        return view('pages.admin.Classe.liste', compact('classes', 'cours'));
     }
 
     public function store(StoreClasseRequest $request)

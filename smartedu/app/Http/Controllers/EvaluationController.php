@@ -32,7 +32,7 @@ class EvaluationController extends Controller
             $cours = Cours::orderBy('titre')->get();
         }
 
-        return view('pages.enseignant.evaluations', compact('evaluations', 'cours'));
+        return view('pages.admin.Evaluation.liste', compact('evaluations', 'cours'));
     }
 
     /**

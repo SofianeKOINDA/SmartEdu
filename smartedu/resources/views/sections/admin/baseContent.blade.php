@@ -5,28 +5,42 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
-                        <h3 class="page-title">Welcome Admin!</h3>
+                        <h3 class="page-title">Bienvenue, {{ auth()->user()->prenom }} !</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                            <li class="breadcrumb-item active">Admin</li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Accueil</a></li>
+                            <li class="breadcrumb-item active">Dashboard Admin</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
 
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
 
+        @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
+
+        <!-- Cartes statistiques -->
         <div class="row">
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Students</h6>
-                                <h3>50055</h3>
+                                <h6>Étudiants</h6>
+                                <h3><a href="{{ route('etudiants.index') }}" class="text-dark">{{ $stats['nb_etudiants'] }}</a></h3>
                             </div>
                             <div class="db-icon">
-                                <img src="templates/assets/img/icons/dash-icon-01.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/dash-icon-01.svg') }}" alt="Icône Dashboard">
                             </div>
                         </div>
                     </div>
@@ -37,11 +51,11 @@
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Awards</h6>
-                                <h3>50+</h3>
+                                <h6>Enseignants</h6>
+                                <h3><a href="{{ route('enseignants.index') }}" class="text-dark">{{ $stats['nb_enseignants'] }}</a></h3>
                             </div>
                             <div class="db-icon">
-                                <img src="templates/assets/img/icons/dash-icon-02.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/dash-icon-02.svg') }}" alt="Icône Dashboard">
                             </div>
                         </div>
                     </div>
@@ -52,11 +66,11 @@
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Department</h6>
-                                <h3>30+</h3>
+                                <h6>Cours</h6>
+                                <h3><a href="{{ route('cours.index') }}" class="text-dark">{{ $stats['nb_cours'] }}</a></h3>
                             </div>
                             <div class="db-icon">
-                                <img src="templates/assets/img/icons/dash-icon-03.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/dash-icon-03.svg') }}" alt="Icône Dashboard">
                             </div>
                         </div>
                     </div>
@@ -67,11 +81,11 @@
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Revenue</h6>
-                                <h3>$505</h3>
+                                <h6>Classes</h6>
+                                <h3><a href="{{ route('classes.index') }}" class="text-dark">{{ $stats['nb_classes'] }}</a></h3>
                             </div>
                             <div class="db-icon">
-                                <img src="templates/assets/img/icons/dash-icon-04.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/dash-icon-04.svg') }}" alt="Icône Dashboard">
                             </div>
                         </div>
                     </div>
@@ -79,293 +93,161 @@
             </div>
         </div>
 
+        <!-- Card Paiements validés -->
         <div class="row">
-            <div class="col-md-12 col-lg-6">
-
-                <div class="card card-chart">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col-6">
-                                <h5 class="card-title">Overview</h5>
+            <div class="col-xl-4 col-sm-6 col-12 d-flex">
+                <div class="card bg-comman w-100">
+                    <div class="card-body">
+                        <div class="db-widgets d-flex justify-content-between align-items-center">
+                            <div class="db-info">
+                                <h6>Paiements validés</h6>
+                                <h3><a href="{{ route('paiements.index') }}" class="text-dark">{{ number_format($stats['total_paiements'], 0, ',', ' ') }} FCFA</a></h3>
                             </div>
-                            <div class="col-6">
-                                <ul class="chart-list-out">
-                                    <li><span class="circle-blue"></span>Teacher</li>
-                                    <li><span class="circle-green"></span>Student</li>
-                                    <li class="star-menus"><a href="javascript:;"><i
-                                                class="fas fa-ellipsis-v"></i></a></li>
-                                </ul>
+                            <div class="db-icon">
+                                <i class="fas fa-coins fa-2x text-success"></i>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div id="apexcharts-area"></div>
-                    </div>
                 </div>
-
-            </div>
-            <div class="col-md-12 col-lg-6">
-
-                <div class="card card-chart">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col-6">
-                                <h5 class="card-title">Number of Students</h5>
-                            </div>
-                            <div class="col-6">
-                                <ul class="chart-list-out">
-                                    <li><span class="circle-blue"></span>Girls</li>
-                                    <li><span class="circle-green"></span>Boys</li>
-                                    <li class="star-menus"><a href="javascript:;"><i
-                                                class="fas fa-ellipsis-v"></i></a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="bar"></div>
-                    </div>
-                </div>
-
             </div>
         </div>
-        <div class="row">
-            <div class="col-xl-6 d-flex">
 
-                <div class="card flex-fill student-space comman-shadow">
-                    <div class="card-header d-flex align-items-center">
-                        <h5 class="card-title">Star Students</h5>
-                        <ul class="chart-list-out student-ellips">
-                            <li class="star-menus"><a href="javascript:;"><i class="fas fa-ellipsis-v"></i></a>
-                            </li>
-                        </ul>
+        <!-- Tableau des derniers étudiants -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card flex-fill comman-shadow">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">Derniers Étudiants inscrits</h5>
+                        <a href="{{ route('etudiants.index') }}" class="btn btn-sm btn-primary">Voir tout</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table
-                                class="table star-student table-hover table-center table-borderless table-striped">
+                            <table class="table table-hover table-center table-borderless table-striped">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th class="text-center">Marks</th>
-                                        <th class="text-center">Percentage</th>
-                                        <th class="text-end">Year</th>
+                                        <th>Matricule</th>
+                                        <th>Nom Prénom</th>
+                                        <th>Classe</th>
+                                        <th>Date naissance</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @forelse($etudiants->take(5) as $etudiant)
                                     <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE2209</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"
-                                                    src="templates/assets/img/profiles/avatar-02.jpg" width="25"
-                                                    alt="Star Students">
-                                                John Smith
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1185</td>
-                                        <td class="text-center">98%</td>
-                                        <td class="text-end">
-                                            <div>2019</div>
+                                        <td>{{ $etudiant->matricule }}</td>
+                                        <td>{{ $etudiant->user->nom }} {{ $etudiant->user->prenom }}</td>
+                                        <td>{{ $etudiant->classe->nom ?? '—' }}</td>
+                                        <td>{{ $etudiant->date_naissance ? \Carbon\Carbon::parse($etudiant->date_naissance)->format('d/m/Y') : '—' }}</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-warning me-1"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editEtudiantDash{{ $etudiant->id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteEtudiantDash{{ $etudiant->id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
+
+                                    <!-- Modal Modifier -->
+                                    <div class="modal fade" id="editEtudiantDash{{ $etudiant->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Modifier l'étudiant</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form action="{{ route('etudiants.update', $etudiant->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Nom</label>
+                                                            <input type="text" name="nom" class="form-control" value="{{ $etudiant->user->nom }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Prénom</label>
+                                                            <input type="text" name="prenom" class="form-control" value="{{ $etudiant->user->prenom }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Email</label>
+                                                            <input type="email" name="email" class="form-control" value="{{ $etudiant->user->email }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Matricule</label>
+                                                            <input type="text" name="matricule" class="form-control" value="{{ $etudiant->matricule }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Date de naissance</label>
+                                                            <input type="date" name="date_naissance" class="form-control" value="{{ $etudiant->date_naissance }}">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Classe</label>
+                                                            <select name="classe_id" class="form-select">
+                                                                @foreach($classes as $classe)
+                                                                <option value="{{ $classe->id }}" {{ $etudiant->classe_id == $classe->id ? 'selected' : '' }}>{{ $classe->nom }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Nouveau mot de passe (optionnel)</label>
+                                                            <input type="password" name="password" class="form-control">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Confirmer le mot de passe</label>
+                                                            <input type="password" name="password_confirmation" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Supprimer -->
+                                    <div class="modal fade" id="deleteEtudiantDash{{ $etudiant->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-sm">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Confirmer la suppression</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Supprimer <strong>{{ $etudiant->user->nom }} {{ $etudiant->user->prenom }}</strong> ?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                    <form action="{{ route('etudiants.destroy', $etudiant->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @empty
                                     <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE1245</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"
-                                                    src="templates/assets/img/profiles/avatar-01.jpg" width="25"
-                                                    alt="Star Students">
-                                                Jolie Hoskins
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1195</td>
-                                        <td class="text-center">99.5%</td>
-                                        <td class="text-end">
-                                            <div>2018</div>
-                                        </td>
+                                        <td colspan="5" class="text-center text-muted">Aucun étudiant enregistré.</td>
                                     </tr>
-                                    <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE1625</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"
-                                                    src="templates/assets/img/profiles/avatar-03.jpg" width="25"
-                                                    alt="Star Students">
-                                                Pennington Joy
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1196</td>
-                                        <td class="text-center">99.6%</td>
-                                        <td class="text-end">
-                                            <div>2017</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE2516</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"
-                                                    src="templates/assets/img/profiles/avatar-04.jpg" width="25"
-                                                    alt="Star Students">
-                                                Millie Marsden
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1187</td>
-                                        <td class="text-center">98.2%</td>
-                                        <td class="text-end">
-                                            <div>2016</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE2209</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"
-                                                    src="templates/assets/img/profiles/avatar-05.jpg" width="25"
-                                                    alt="Star Students">
-                                                John Smith
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1185</td>
-                                        <td class="text-center">98%</td>
-                                        <td class="text-end">
-                                            <div>2015</div>
-                                        </td>
-                                    </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-
-            </div>
-            <div class="col-xl-6 d-flex">
-
-                <div class="card flex-fill comman-shadow">
-                    <div class="card-header d-flex align-items-center">
-                        <h5 class="card-title ">Student Activity </h5>
-                        <ul class="chart-list-out student-ellips">
-                            <li class="star-menus"><a href="javascript:;"><i class="fas fa-ellipsis-v"></i></a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="card-body">
-                        <div class="activity-groups">
-                            <div class="activity-awards">
-                                <div class="award-boxs">
-                                    <img src="templates/assets/img/icons/award-icon-01.svg" alt="Award">
-                                </div>
-                                <div class="award-list-outs">
-                                    <h4>1st place in "Chess”</h4>
-                                    <h5>John Doe won 1st place in "Chess"</h5>
-                                </div>
-                                <div class="award-time-list">
-                                    <span>1 Day ago</span>
-                                </div>
-                            </div>
-                            <div class="activity-awards">
-                                <div class="award-boxs">
-                                    <img src="templates/assets/img/icons/award-icon-02.svg" alt="Award">
-                                </div>
-                                <div class="award-list-outs">
-                                    <h4>Participated in "Carrom"</h4>
-                                    <h5>Justin Lee participated in "Carrom"</h5>
-                                </div>
-                                <div class="award-time-list">
-                                    <span>2 hours ago</span>
-                                </div>
-                            </div>
-                            <div class="activity-awards">
-                                <div class="award-boxs">
-                                    <img src="templates/assets/img/icons/award-icon-03.svg" alt="Award">
-                                </div>
-                                <div class="award-list-outs">
-                                    <h4>Internation conference in "St.John School"</h4>
-                                    <h5>Justin Leeattended internation conference in "St.John School"</h5>
-                                </div>
-                                <div class="award-time-list">
-                                    <span>2 Week ago</span>
-                                </div>
-                            </div>
-                            <div class="activity-awards mb-0">
-                                <div class="award-boxs">
-                                    <img src="templates/assets/img/icons/award-icon-04.svg" alt="Award">
-                                </div>
-                                <div class="award-list-outs">
-                                    <h4>Won 1st place in "Chess"</h4>
-                                    <h5>John Doe won 1st place in "Chess"</h5>
-                                </div>
-                                <div class="award-time-list">
-                                    <span>3 Day ago</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-xl-3 col-sm-6 col-12">
-                <div class="card flex-fill fb sm-box">
-                    <div class="social-likes">
-                        <p>Like us on facebook</p>
-                        <h6>50,095</h6>
-                    </div>
-                    <div class="social-boxs">
-                        <img src="templates/assets/img/icons/social-icon-01.svg" alt="Social Icon">
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 col-12">
-                <div class="card flex-fill twitter sm-box">
-                    <div class="social-likes">
-                        <p>Follow us on twitter</p>
-                        <h6>48,596</h6>
-                    </div>
-                    <div class="social-boxs">
-                        <img src="templates/assets/img/icons/social-icon-02.svg" alt="Social Icon">
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 col-12">
-                <div class="card flex-fill insta sm-box">
-                    <div class="social-likes">
-                        <p>Follow us on instagram</p>
-                        <h6>52,085</h6>
-                    </div>
-                    <div class="social-boxs">
-                        <img src="templates/assets/img/icons/social-icon-03.svg" alt="Social Icon">
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 col-12">
-                <div class="card flex-fill linkedin sm-box">
-                    <div class="social-likes">
-                        <p>Follow us on linkedin</p>
-                        <h6>69,050</h6>
-                    </div>
-                    <div class="social-boxs">
-                        <img src="templates/assets/img/icons/social-icon-04.svg" alt="Social Icon">
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     <footer>
-        <p>Copyright © 2022 Dreamguys.</p>
+        <p>Copyright &copy; {{ date('Y') }} SmartEdu.</p>
     </footer>
 </div>

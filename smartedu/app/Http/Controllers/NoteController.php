@@ -32,7 +32,8 @@ class NoteController extends Controller
 
         $evaluations = Evaluation::with('cours')->orderBy('titre')->get();
 
-        return view('pages.enseignant.notes', compact('notes', 'evaluations'));
+        $etudiants = \App\Models\Etudiant::with('user')->orderBy('matricule')->get();
+        return view('pages.admin.Note.liste', compact('notes', 'evaluations', 'etudiants'));
     }
 
     /**

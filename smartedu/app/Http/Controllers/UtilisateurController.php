@@ -17,7 +17,7 @@ class UtilisateurController extends Controller
         $users = User::with(['etudiant', 'enseignant', 'administrateur'])
             ->orderBy('role')
             ->paginate(20);
-        return view('pages.admin.utilisateurs', compact('users'));
+        return view('pages.admin.User.liste', compact('users'));
     }
 
     /**

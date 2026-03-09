@@ -49,7 +49,7 @@ class EtudiantController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
-        return view('pages.etudiant.dashboard', compact(
+        return view('etudiant', compact(
             'etudiant', 'notes', 'evaluations', 'presences', 'paiements'
         ));
     }
@@ -95,7 +95,7 @@ class EtudiantController extends Controller
         $etudiants = Etudiant::with(['user', 'classe'])->latest()->paginate(15);
         $classes   = Classe::orderBy('nom')->get();
 
-        return view('pages.admin.etudiants', compact('etudiants', 'classes'));
+        return view('pages.admin.Etudiant.liste', compact('etudiants', 'classes'));
     }
 
     /**

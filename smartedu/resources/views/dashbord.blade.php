@@ -8,7 +8,6 @@
         @include("sections.admin.menuHaut")
 
          <!-- Section loader -->
-         @include("sections.admin.loader")
 
          <!-- Section loader -->
         @include("sections.admin.menuGauche")

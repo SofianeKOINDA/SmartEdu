@@ -15,7 +15,7 @@ class CoursController extends Controller
         $cours      = Cours::with('enseignant.user')->withCount(['evaluations', 'presences'])->latest()->paginate(15);
         $enseignants = Enseignant::with('user')->orderBy('matricule_enseignant')->get();
         $classes     = Classe::orderBy('nom')->get();
-        return view('pages.admin.cours', compact('cours', 'enseignants', 'classes'));
+        return view('pages.admin.Cours.liste', compact('cours', 'enseignants', 'classes'));
     }
 
     public function store(StoreCoursRequest $request)

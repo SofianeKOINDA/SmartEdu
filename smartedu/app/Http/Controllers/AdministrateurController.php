@@ -35,7 +35,7 @@ class AdministrateurController extends Controller
         $cours           = Cours::with('enseignant.user')->withCount('evaluations')->latest()->get();
         $paiements       = Paiement::with('etudiant.user')->latest('date')->paginate(10, ['*'], 'paiements_page');
 
-        return view('pages.admin.dashboard', compact(
+        return view('dashbord', compact(
             'stats', 'etudiants', 'enseignants', 'administrateurs',
             'classes', 'cours', 'paiements'
         ));
