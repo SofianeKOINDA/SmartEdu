@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classe;
+use App\Models\Cours;
 use App\Models\Enseignant;
 use App\Models\Etudiant;
 use App\Models\Evaluation;
@@ -92,15 +94,32 @@ class EnseignantController extends Controller
 
     public function mesCours()
     {
-        $enseignant = Auth::user()->enseignant;
+        $enseignant    = Auth::user()->enseignant;
         if (!$enseignant) abort(403);
 
-        $cours = $enseignant->cours()
+        $cours         = $enseignant->cours()
             ->with(['classes'])
             ->withCount(['evaluations', 'presences'])
             ->get();
 
-        return view('pages.enseignant.Cours.liste', compact('enseignant', 'cours'));
+        $toutesClasses = Classe::orderBy('nom')->get();
+
+        return view('pages.enseignant.Cours.liste', compact('enseignant', 'cours', 'toutesClasses'));
+    }
+
+    /**
+     * Synchronise les classes associées à un cours de l'enseignant.
+     */
+    public function syncClasses(Request $request, Cours $cours)
+    {
+        $enseignant = Auth::user()->enseignant;
+        if ($cours->enseignant_matricule !== $enseignant->matricule_enseignant) {
+            abort(403);
+        }
+
+        $cours->classes()->sync($request->input('classe_ids', []));
+
+        return redirect()->back()->with('success', 'Classes du cours mises à jour.');
     }
 
     public function mesEvaluations()
@@ -171,7 +190,47 @@ class EnseignantController extends Controller
             ->flatMap->classes
             ->unique('id');
 
-        return view('pages.enseignant.Classe.liste', compact('enseignant', 'classes'));
+        // Étudiants sans classe ou dans une autre classe (pour pouvoir les ajouter)
+        $tousEtudiants = Etudiant::with('user')->orderBy('id')->get();
+
+        return view('pages.enseignant.Classe.liste', compact('enseignant', 'classes', 'tousEtudiants'));
+    }
+
+    /**
+     * Affecte un étudiant à une classe de l'enseignant.
+     */
+    public function ajouterEtudiant(Request $request, Classe $classe)
+    {
+        $enseignant = Auth::user()->enseignant;
+        $classeIds  = $enseignant->cours()->with('classes')->get()
+            ->flatMap->classes->unique('id')->pluck('id');
+
+        if (!$classeIds->contains($classe->id)) abort(403);
+
+        $request->validate([
+            'etudiant_matricule' => ['required', 'string', 'exists:etudiants,matricule'],
+        ]);
+
+        Etudiant::where('matricule', $request->etudiant_matricule)
+            ->update(['classe_id' => $classe->id]);
+
+        return redirect()->back()->with('success', 'Étudiant ajouté à la classe.');
+    }
+
+    /**
+     * Retire un étudiant d'une classe de l'enseignant (classe_id → null).
+     */
+    public function retirerEtudiant(Classe $classe, Etudiant $etudiant)
+    {
+        $enseignant = Auth::user()->enseignant;
+        $classeIds  = $enseignant->cours()->with('classes')->get()
+            ->flatMap->classes->unique('id')->pluck('id');
+
+        if (!$classeIds->contains($classe->id)) abort(403);
+
+        $etudiant->update(['classe_id' => null]);
+
+        return redirect()->back()->with('success', 'Étudiant retiré de la classe.');
     }
 
     public function mesEtudiants()

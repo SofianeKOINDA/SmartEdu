@@ -15,6 +15,7 @@ class Paiement extends Model
         'statut',
         'methode',
         'type',
+        'paytech_token',
     ];
 
     protected function casts(): array

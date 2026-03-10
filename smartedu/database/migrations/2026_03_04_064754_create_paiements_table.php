@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('statut');
             $table->string('methode');
             $table->string('type');
+            $table->string('paytech_token')->nullable();
             $table->timestamps();
         });
     }

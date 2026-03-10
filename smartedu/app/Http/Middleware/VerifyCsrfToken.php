@@ -12,7 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        // 'api/payments/paytech/callback', // Webhook PayTech
-        'api/payments/paydunya/callback'
+        'paytech/ipn', // Webhook PayTech (appelé par les serveurs PayTech)
     ];
 }

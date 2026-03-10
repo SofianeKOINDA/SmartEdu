@@ -97,6 +97,11 @@
                                             <td>{{ number_format($paiement->montant, 0, ',', ' ') }} FCFA</td>
                                             <td>{{ $methodeLabels[$paiement->methode] ?? ($paiement->methode ?? '—') }}</td>
                                             <td class="text-center">
+                                                @if($paiement->statut === 'en_attente')
+                                                <a href="{{ route('paytech.initiate', $paiement->id) }}" class="badge bg-warning text-dark text-decoration-none">
+                                                    <i class="fas fa-credit-card me-1"></i>Payer
+                                                </a>
+                                                @endif
                                                 @if($paiement->statut === 'valide')
                                                     <span class="badge bg-success">Validé</span>
                                                 @elseif($paiement->statut === 'en_attente')

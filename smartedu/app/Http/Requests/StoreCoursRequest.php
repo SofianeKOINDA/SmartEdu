@@ -16,7 +16,7 @@ class StoreCoursRequest extends FormRequest
         return [
             'titre'               => ['required', 'string', 'max:200'],
             'enseignant_matricule'=> ['required', 'string', 'exists:enseignants,matricule_enseignant'],
-            'type'                => ['required', 'in:presentiel,en_ligne,hybride'],
+            'type'                => ['required', 'string'],
             'description'         => ['nullable', 'string'],
         ];
     }
@@ -26,7 +26,7 @@ class StoreCoursRequest extends FormRequest
             'titre.required' => 'Le titre du cours est requis.',
             'enseignant_matricule.required' => 'Le matricule de l\'enseignant est requis.',
             'type.required' => 'Le type de cours est requis.',
-            'type.in' => 'Le type de cours doit être présentiel, en ligne ou hybride.',
+            'type.string' => 'Le type de cours doit être une chaîne de caractères.',
         ];
     }
 }

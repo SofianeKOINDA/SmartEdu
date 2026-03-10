@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'  => \App\Http\Middleware\CheckRole::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
+
+        // Exclure le webhook PayTech du CSRF
+        $middleware->validateCsrfTokens(except: [
+            'paytech/ipn',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

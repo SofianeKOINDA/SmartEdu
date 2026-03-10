@@ -10,12 +10,23 @@ use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\PaiementController;
+use App\Http\Controllers\PayTechController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Authentification ─────────────────────────────────────────────────────────
 Route::redirect('/', '/login');
 
 require __DIR__.'/auth.php';
+
+// ─── PayTech ──────────────────────────────────────────────────────────────────
+// IPN : pas de middleware auth (appelé par les serveurs PayTech)
+Route::post('/paytech/ipn', [PayTechController::class, 'ipn'])->name('paytech.ipn');
+
+// Redirections après paiement (etudiant connecté)
+Route::middleware(['auth', 'role:etudiant'])->group(function () {
+    Route::get('/paytech/success/{paiement}', [PayTechController::class, 'success'])->name('paytech.success');
+    Route::get('/paytech/cancel/{paiement}',  [PayTechController::class, 'cancel'] )->name('paytech.cancel');
+});
 
 // ─── Administration ───────────────────────────────────────────────────────────
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
@@ -106,6 +117,13 @@ Route::prefix('enseignant')->middleware(['auth', 'role:enseignant'])->group(func
 
     Route::put('/profil', [EnseignantController::class, 'updateProfil'])->name('enseignant.profil.update');
 
+    // Gestion classes ↔ cours
+    Route::post('/cours/{cours}/classes',                        [EnseignantController::class, 'syncClasses']    )->name('enseignant.cours.classes.sync');
+
+    // Gestion étudiants ↔ classes
+    Route::post('/classes/{classe}/etudiants',                   [EnseignantController::class, 'ajouterEtudiant'])->name('enseignant.classe.etudiant.add');
+    Route::delete('/classes/{classe}/etudiants/{etudiant}',      [EnseignantController::class, 'retirerEtudiant'])->name('enseignant.classe.etudiant.remove');
+
     // CRUD Évaluations
     Route::post('/evaluations',                [EvaluationController::class, 'store']  )->name('enseignant.evaluations.store');
     Route::put('/evaluations/{evaluation}',    [EvaluationController::class, 'update'] )->name('enseignant.evaluations.update');
@@ -132,7 +150,8 @@ Route::prefix('etudiant')->middleware(['auth', 'role:etudiant'])->group(function
     Route::get('/notes',     [EtudiantController::class, 'mesNotes']    )->name('etudiant.notes');
     Route::get('/cours',     [EtudiantController::class, 'mesCours']    )->name('etudiant.cours');
     Route::get('/presences', [EtudiantController::class, 'mesPresences'])->name('etudiant.presences');
-    Route::get('/paiements', [EtudiantController::class, 'mesPaiements'])->name('etudiant.paiements');
+    Route::get('/paiements',                      [EtudiantController::class, 'mesPaiements']   )->name('etudiant.paiements');
+    Route::get('/paiements/{paiement}/pay',       [PayTechController::class,  'initiate']       )->name('paytech.initiate');
     Route::get('/classe',    [EtudiantController::class, 'maClasse']    )->name('etudiant.classe');
 
     Route::put('/profil', [EtudiantController::class, 'updateProfil'])
