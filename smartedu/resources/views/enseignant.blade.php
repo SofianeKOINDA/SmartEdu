@@ -12,6 +12,7 @@
 
     <!-- Section baseContent-->
     @include("sections.enseignant.baseContent")
+    @include("sections.enseignant.profilModal")
 
 </div>
     <!-- Section Script-->

@@ -64,10 +64,15 @@
                                     </thead>
                                     <tbody>
                                         @forelse($paiements as $paiement)
+                                        @php
+                                            $methodeLabels = ['especes'=>'Espèces','virement'=>'Virement','carte'=>'Carte','mobile_money'=>'Mobile Money'];
+                                            $typeLabels    = ['scolarite'=>'Scolarité','inscription'=>'Inscription'];
+                                        @endphp
                                         <tr>
                                             <td>
                                                 @if($paiement->etudiant && $paiement->etudiant->user)
                                                     {{ $paiement->etudiant->user->nom }} {{ $paiement->etudiant->user->prenom }}
+                                                    <small class="text-muted d-block">{{ $paiement->etudiant_matricule }}</small>
                                                 @else
                                                     —
                                                 @endif
@@ -79,14 +84,16 @@
                                                     <span class="badge bg-success">Validé</span>
                                                 @elseif($paiement->statut === 'en_attente')
                                                     <span class="badge bg-warning text-dark">En attente</span>
-                                                @elseif($paiement->statut === 'rejete')
-                                                    <span class="badge bg-danger">Rejeté</span>
+                                                @elseif($paiement->statut === 'refuse')
+                                                    <span class="badge bg-danger">Refusé</span>
+                                                @elseif($paiement->statut === 'rembourse')
+                                                    <span class="badge bg-info text-dark">Remboursé</span>
                                                 @else
-                                                    {{ $paiement->statut ?? '—' }}
+                                                    <span class="badge bg-secondary">{{ $paiement->statut ?? '—' }}</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $paiement->methode ?? '—' }}</td>
-                                            <td>{{ $paiement->type ?? '—' }}</td>
+                                            <td>{{ $methodeLabels[$paiement->methode] ?? ($paiement->methode ?? '—') }}</td>
+                                            <td>{{ $typeLabels[$paiement->type] ?? ($paiement->type ?? '—') }}</td>
                                             <td class="text-center">
                                                 <button class="btn btn-sm btn-warning me-1"
                                                     data-bs-toggle="modal"
@@ -143,27 +150,38 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Montant (FCFA) <span class="text-danger">*</span></label>
-                            <input type="number" name="montant" class="form-control" min="0" required>
+                            <input type="number" name="montant" class="form-control" min="0" step="1" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Date <span class="text-danger">*</span></label>
                             <input type="date" name="date" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Statut</label>
-                            <select name="statut" class="form-select">
+                            <label class="form-label">Statut <span class="text-danger">*</span></label>
+                            <select name="statut" class="form-select" required>
                                 <option value="en_attente">En attente</option>
                                 <option value="valide">Validé</option>
-                                <option value="rejete">Rejeté</option>
+                                <option value="refuse">Refusé</option>
+                                <option value="rembourse">Remboursé</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Méthode</label>
-                            <input type="text" name="methode" class="form-control" placeholder="Ex: Espèces, Virement, Mobile money...">
+                            <label class="form-label">Méthode <span class="text-danger">*</span></label>
+                            <select name="methode" class="form-select" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="especes">Espèces</option>
+                                <option value="virement">Virement</option>
+                                <option value="carte">Carte bancaire</option>
+                                <option value="mobile_money">Mobile Money</option>
+                            </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Type</label>
-                            <input type="text" name="type" class="form-control" placeholder="Ex: Scolarité, Inscription...">
+                            <label class="form-label">Type <span class="text-danger">*</span></label>
+                            <select name="type" class="form-select" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="scolarite">Scolarité</option>
+                                <option value="inscription">Inscription</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -196,7 +214,7 @@
                                 <option value="">-- Sélectionner un étudiant --</option>
                                 @foreach($etudiants as $etudiant)
                                 <option value="{{ $etudiant->matricule }}"
-                                    {{ $paiement->etudiant && $paiement->etudiant->matricule == $etudiant->matricule ? 'selected' : '' }}>
+                                    {{ $paiement->etudiant_matricule == $etudiant->matricule ? 'selected' : '' }}>
                                     {{ $etudiant->user->nom }} {{ $etudiant->user->prenom }} ({{ $etudiant->matricule }})
                                 </option>
                                 @endforeach
@@ -204,27 +222,36 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Montant (FCFA) <span class="text-danger">*</span></label>
-                            <input type="number" name="montant" class="form-control" min="0" value="{{ $paiement->montant }}" required>
+                            <input type="number" name="montant" class="form-control" min="0" step="1" value="{{ $paiement->montant }}" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Date <span class="text-danger">*</span></label>
-                            <input type="date" name="date" class="form-control" value="{{ $paiement->date }}" required>
+                            <input type="date" name="date" class="form-control" value="{{ $paiement->date ? \Carbon\Carbon::parse($paiement->date)->format('Y-m-d') : '' }}" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Statut</label>
-                            <select name="statut" class="form-select">
+                            <label class="form-label">Statut <span class="text-danger">*</span></label>
+                            <select name="statut" class="form-select" required>
                                 <option value="en_attente" {{ $paiement->statut === 'en_attente' ? 'selected' : '' }}>En attente</option>
-                                <option value="valide" {{ $paiement->statut === 'valide' ? 'selected' : '' }}>Validé</option>
-                                <option value="rejete" {{ $paiement->statut === 'rejete' ? 'selected' : '' }}>Rejeté</option>
+                                <option value="valide"     {{ $paiement->statut === 'valide'     ? 'selected' : '' }}>Validé</option>
+                                <option value="refuse"     {{ $paiement->statut === 'refuse'     ? 'selected' : '' }}>Refusé</option>
+                                <option value="rembourse"  {{ $paiement->statut === 'rembourse'  ? 'selected' : '' }}>Remboursé</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Méthode</label>
-                            <input type="text" name="methode" class="form-control" value="{{ $paiement->methode }}">
+                            <label class="form-label">Méthode <span class="text-danger">*</span></label>
+                            <select name="methode" class="form-select" required>
+                                <option value="especes"      {{ $paiement->methode === 'especes'      ? 'selected' : '' }}>Espèces</option>
+                                <option value="virement"     {{ $paiement->methode === 'virement'     ? 'selected' : '' }}>Virement</option>
+                                <option value="carte"        {{ $paiement->methode === 'carte'        ? 'selected' : '' }}>Carte bancaire</option>
+                                <option value="mobile_money" {{ $paiement->methode === 'mobile_money' ? 'selected' : '' }}>Mobile Money</option>
+                            </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Type</label>
-                            <input type="text" name="type" class="form-control" value="{{ $paiement->type }}">
+                            <label class="form-label">Type <span class="text-danger">*</span></label>
+                            <select name="type" class="form-select" required>
+                                <option value="scolarite"   {{ $paiement->type === 'scolarite'   ? 'selected' : '' }}>Scolarité</option>
+                                <option value="inscription" {{ $paiement->type === 'inscription' ? 'selected' : '' }}>Inscription</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -261,6 +288,7 @@
 </div>
 @endforeach
 
+@include("sections.admin.profilModal")
 @include("sections.admin.script")
 </body>
 </html>

@@ -41,6 +41,29 @@ class AdministrateurController extends Controller
         ));
     }
 
+
+    /**
+     * L'administrateur met à jour son profil.
+     */
+    public function updateProfil(Request $request)
+    {
+        $request->validate([
+            'nom'          => ['required', 'string', 'max:100'],
+            'prenom'       => ['required', 'string', 'max:100'],
+            'photo_profil' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        $data = ['nom' => $request->nom, 'prenom' => $request->prenom];
+
+        if ($request->hasFile('photo_profil')) {
+            $data['photo_profil'] = $request->file('photo_profil')->store('profils', 'public');
+        }
+
+        \App\Models\User::where('id', Auth::id())->update($data);
+
+        return redirect()->back()->with('success', 'Profil mis à jour avec succès.');
+    }
+
     /**
      * Créer un administrateur (User + Administrateur) via modal.
      */

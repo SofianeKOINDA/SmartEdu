@@ -238,6 +238,7 @@
 </div>
 @endforeach
 
+@include("sections.admin.profilModal")
 @include("sections.admin.script")
 </body>
 </html>

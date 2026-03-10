@@ -1,404 +1,246 @@
 <div class="page-wrapper">
     <div class="content container-fluid">
 
-        <!-- ===== Page Header ===== -->
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
-                        <h3 class="page-title">Welcome Jonathan!</h3>
+                        <h3 class="page-title">Bienvenue, {{ auth()->user()->prenom }} !</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                            <li class="breadcrumb-item active">Teacher</li>
+                            <li class="breadcrumb-item"><a href="{{ route('enseignant.dashboard') }}">Accueil</a></li>
+                            <li class="breadcrumb-item active">Dashboard Enseignant</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== Stats Cards ===== -->
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+        @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        <!-- Cartes statistiques -->
         <div class="row">
-
-            <!-- Total Classes -->
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Total Classes</h6>
-                                <h3>04/06</h3>
+                                <h6>Mes Cours</h6>
+                                <h3><a href="{{ route('enseignant.cours') }}" class="text-dark">{{ $cours->count() }}</a></h3>
                             </div>
                             <div class="db-icon">
-                                <img src="templates/assets/img/icons/teacher-icon-01.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/teacher-icon-02.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Total Students -->
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Total Students</h6>
-                                <h3>40/60</h3>
+                                <h6>Mes Classes</h6>
+                                <h3><a href="{{ route('enseignant.classes') }}" class="text-dark">{{ $classes->count() }}</a></h3>
                             </div>
                             <div class="db-icon">
-                                <img src="templates/assets/img/icons/dash-icon-01.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/teacher-icon-01.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Total Lessons -->
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Total Lessons</h6>
-                                <h3>30/50</h3>
+                                <h6>Mes Étudiants</h6>
+                                <h3><a href="{{ route('enseignant.etudiants') }}" class="text-dark">{{ $etudiants->count() }}</a></h3>
                             </div>
                             <div class="db-icon">
-                                <img src="templates/assets/img/icons/teacher-icon-02.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/dash-icon-01.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Total Hours -->
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Total Hours</h6>
-                                <h3>15/20</h3>
+                                <h6>Évaluations</h6>
+                                <h3><a href="{{ route('enseignant.evaluations') }}" class="text-dark">{{ $evaluations->count() }}</a></h3>
                             </div>
                             <div class="db-icon">
-                                <img src="templates/assets/img/icons/teacher-icon-03.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/teacher-icon-03.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-        </div><!-- /.row stats cards -->
-
-        <!-- ===== Main Content Row ===== -->
         <div class="row">
-
-            <!-- Left Column (8/12) -->
-            <div class="col-12 col-lg-12 col-xl-8">
-                <div class="row">
-
-                    <!-- Upcoming Lesson -->
-                    <div class="col-12 col-lg-8 col-xl-8 d-flex">
-                        <div class="card flex-fill comman-shadow">
-                            <div class="card-header">
-                                <div class="row align-items-center">
-                                    <div class="col-6">
-                                        <h5 class="card-title">Upcoming Lesson</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <span class="float-end view-link">
-                                            <a href="#">View All Courses</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pt-3 pb-3">
-                                <div class="table-responsive lesson">
-                                    <table class="table table-center">
-                                        <tbody>
-
-                                            <tr>
-                                                <td>
-                                                    <div class="date">
-                                                        <b>Lessons 30</b>
-                                                        <p>3.1 Ipsuum dolor</p>
-                                                        <ul class="teacher-date-list">
-                                                            <li><i class="fas fa-calendar-alt me-2"></i>Sep 5, 2022</li>
-                                                            <li>|</li>
-                                                            <li><i class="fas fa-clock me-2"></i>09:00 - 10:00 am</li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="lesson-confirm">
-                                                        <a href="#">Confirmed</a>
-                                                    </div>
-                                                    <button type="submit" class="btn btn-info">Reschedule</button>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>
-                                                    <div class="date">
-                                                        <b>Lessons 30</b>
-                                                        <p>3.1 Ipsuum dolor</p>
-                                                        <ul class="teacher-date-list">
-                                                            <li><i class="fas fa-calendar-alt me-2"></i>Sep 5, 2022</li>
-                                                            <li>|</li>
-                                                            <li><i class="fas fa-clock me-2"></i>09:00 - 10:00 am</li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="lesson-confirm">
-                                                        <a href="#">Confirmed</a>
-                                                    </div>
-                                                    <button type="submit" class="btn btn-info">Reschedule</button>
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Évaluations à venir -->
+            <div class="col-12 col-xl-8">
+                <div class="card comman-shadow">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">Évaluations à venir</h5>
+                        <a href="{{ route('enseignant.evaluations') }}" class="btn btn-sm btn-primary">Voir tout</a>
                     </div>
-
-                    <!-- Semester Progress -->
-                    <div class="col-12 col-lg-4 col-xl-4 d-flex">
-                        <div class="card flex-fill comman-shadow">
-                            <div class="card-header">
-                                <div class="row align-items-center">
-                                    <div class="col-12">
-                                        <h5 class="card-title">Semester Progress</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="dash-widget">
-                                <div class="circle-bar circle-bar1">
-                                    <div class="circle-graph1" data-percent="50">
-                                        <div class="progress-less">
-                                            <b>55/60</b>
-                                            <p>Lesson Progressed</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div><!-- /.row -->
-
-                <div class="row">
-
-                    <!-- Teaching Activity -->
-                    <div class="col-12 col-lg-12 col-xl-12 d-flex">
-                        <div class="card flex-fill comman-shadow">
-                            <div class="card-header">
-                                <div class="row align-items-center">
-                                    <div class="col-6">
-                                        <h5 class="card-title">Teaching Activity</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <ul class="chart-list-out">
-                                            <li><span class="circle-blue"></span>Teacher</li>
-                                            <li><span class="circle-green"></span>Students</li>
-                                            <li class="star-menus">
-                                                <a href="javascript:;"><i class="fas fa-ellipsis-v"></i></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div id="school-area"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Teaching History -->
-                    <div class="col-12 col-lg-12 col-xl-12 d-flex">
-                        <div class="card flex-fill comman-shadow">
-                            <div class="card-header d-flex align-items-center">
-                                <h5 class="card-title">Teaching History</h5>
-                                <ul class="chart-list-out student-ellips">
-                                    <li class="star-menus">
-                                        <a href="javascript:;"><i class="fas fa-ellipsis-v"></i></a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-body">
-                                <div class="teaching-card">
-
-                                    <ul class="steps-history">
-                                        <li>Sep22</li>
-                                        <li>Sep23</li>
-                                        <li>Sep24</li>
-                                    </ul>
-
-                                    <ul class="activity-feed">
-
-                                        <!-- Mathematics -->
-                                        <li class="feed-item d-flex align-items-center">
-                                            <div class="dolor-activity">
-                                                <span class="feed-text1"><a>Mathematics</a></span>
-                                                <ul class="teacher-date-list">
-                                                    <li><i class="fas fa-calendar-alt me-2"></i>September 5, 2022</li>
-                                                    <li>|</li>
-                                                    <li><i class="fas fa-clock me-2"></i>09:00 am - 10:00 am (60 Minutes)</li>
-                                                </ul>
-                                            </div>
-                                            <div class="activity-btns ms-auto">
-                                                <button type="submit" class="btn btn-info">In Progress</button>
-                                            </div>
-                                        </li>
-
-                                        <!-- Geography -->
-                                        <li class="feed-item d-flex align-items-center">
-                                            <div class="dolor-activity">
-                                                <span class="feed-text1"><a>Geography</a></span>
-                                                <ul class="teacher-date-list">
-                                                    <li><i class="fas fa-calendar-alt me-2"></i>September 5, 2022</li>
-                                                    <li>|</li>
-                                                    <li><i class="fas fa-clock me-2"></i>09:00 am - 10:00 am (60 Minutes)</li>
-                                                </ul>
-                                            </div>
-                                            <div class="activity-btns ms-auto">
-                                                <button type="submit" class="btn btn-info">Completed</button>
-                                            </div>
-                                        </li>
-
-                                        <!-- Botony -->
-                                        <li class="feed-item d-flex align-items-center">
-                                            <div class="dolor-activity">
-                                                <span class="feed-text1"><a>Botony</a></span>
-                                                <ul class="teacher-date-list">
-                                                    <li><i class="fas fa-calendar-alt me-2"></i>September 5, 2022</li>
-                                                    <li>|</li>
-                                                    <li><i class="fas fa-clock me-2"></i>09:00 am - 10:00 am (60 Minutes)</li>
-                                                </ul>
-                                            </div>
-                                            <div class="activity-btns ms-auto">
-                                                <button type="submit" class="btn btn-info">In Progress</button>
-                                            </div>
-                                        </li>
-
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div><!-- /.row -->
-            </div><!-- /.col left (8/12) -->
-
-            <!-- Right Column (4/12) - Calendar -->
-            <div class="col-12 col-lg-12 col-xl-4 d-flex">
-                <div class="card flex-fill comman-shadow">
                     <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center table-borderless mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Cours</th>
+                                        <th>Titre</th>
+                                        <th>Type</th>
+                                        <th>Date limite</th>
+                                        <th>Coeff.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($evaluations->where('date_limite', '>=', now())->take(5) as $eval)
+                                    <tr>
+                                        <td>{{ $eval->cours->titre ?? '—' }}</td>
+                                        <td>{{ $eval->titre }}</td>
+                                        <td><span class="badge bg-secondary">{{ $eval->type }}</span></td>
+                                        <td>
+                                            @php $diff = now()->diffInDays($eval->date_limite, false); @endphp
+                                            @if($diff <= 3)
+                                                <span class="badge bg-danger">{{ $eval->date_limite->format('d/m/Y') }}</span>
+                                            @elseif($diff <= 7)
+                                                <span class="badge bg-warning text-dark">{{ $eval->date_limite->format('d/m/Y') }}</span>
+                                            @else
+                                                <span class="badge bg-success">{{ $eval->date_limite->format('d/m/Y') }}</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $eval->coefficient }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr><td colspan="5" class="text-center text-muted">Aucune évaluation à venir.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div id="calendar-doctor" class="calendar-container"></div>
+            <!-- Mes Cours -->
+            <div class="col-12 col-xl-4">
+                <div class="card comman-shadow">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">Mes Cours</h5>
+                        <a href="{{ route('enseignant.cours') }}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            @forelse($cours->take(6) as $c)
+                            <li class="mb-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-book me-2 text-primary"></i>
+                                    {{ $c->titre }}
+                                </div>
+                                <span class="badge bg-info text-dark">{{ $c->evaluations_count }} éval.</span>
+                            </li>
+                            @empty
+                            <li class="text-muted">Aucun cours assigné.</li>
+                            @endforelse
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <div class="calendar-info calendar-info1">
+        <!-- Notes récentes & Présences récentes -->
+        <div class="row">
+            <div class="col-12 col-xl-6">
+                <div class="card comman-shadow">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">Notes récentes</h5>
+                        <a href="{{ route('enseignant.notes') }}" class="btn btn-sm btn-primary">Voir tout</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center table-borderless mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Étudiant</th>
+                                        <th>Évaluation</th>
+                                        <th class="text-center">Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($notesRecentes->take(5) as $note)
+                                    <tr>
+                                        <td>{{ $note->etudiant->user->prenom ?? '—' }} {{ $note->etudiant->user->nom ?? '' }}</td>
+                                        <td>{{ $note->evaluation->titre ?? '—' }}</td>
+                                        <td class="text-center">
+                                            @if($note->valeur >= 10)
+                                                <span class="badge bg-success">{{ $note->valeur }}/20</span>
+                                            @else
+                                                <span class="badge bg-danger">{{ $note->valeur }}/20</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr><td colspan="3" class="text-center text-muted">Aucune note saisie.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                            <div class="up-come-header">
-                                <h2>Upcoming Events</h2>
-                                <span>
-                                    <a href="javascript:;"><i class="feather-plus"></i></a>
+            <div class="col-12 col-xl-6">
+                <div class="card comman-shadow">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">Présences récentes</h5>
+                        <a href="{{ route('enseignant.presences') }}" class="btn btn-sm btn-primary">Voir tout</a>
+                    </div>
+                    <div class="card-body">
+                        <ul class="activity-feed mb-0">
+                            @forelse($presencesRecentes->take(6) as $presence)
+                            <li class="feed-item">
+                                <div class="feed-date">{{ $presence->date ? \Carbon\Carbon::parse($presence->date)->format('d/m') : '—' }}</div>
+                                <span class="feed-text">
+                                    <strong>{{ $presence->etudiant->user->prenom ?? '—' }} {{ $presence->etudiant->user->nom ?? '' }}</strong>
+                                    — {{ $presence->cours->titre ?? '—' }}
+                                    @if($presence->statut === 'present')
+                                        <span class="badge bg-success ms-1">Présent</span>
+                                    @elseif($presence->statut === 'absent')
+                                        <span class="badge bg-danger ms-1">Absent</span>
+                                    @else
+                                        <span class="badge bg-warning text-dark ms-1">{{ ucfirst($presence->statut) }}</span>
+                                    @endif
                                 </span>
-                            </div>
+                            </li>
+                            @empty
+                            <li class="text-muted">Aucune présence saisie.</li>
+                            @endforelse
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            <!-- Event Date 1 -->
-                            <div class="upcome-event-date">
-                                <h3>10 Jan</h3>
-                                <span><i class="fas fa-ellipsis-h"></i></span>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>08:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Botony</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>08:00 - 09:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>09:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Botony</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>09:00 - 10:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>10:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Botony</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>10:00 - 11:00 am</span>
-                                </div>
-                            </div>
-
-                            <!-- Event Date 2 -->
-                            <div class="upcome-event-date">
-                                <h3>10 Jan</h3>
-                                <span><i class="fas fa-ellipsis-h"></i></span>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>08:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>English</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>08:00 - 09:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>09:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Mathematics</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>09:00 - 10:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>10:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>History</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>10:00 - 11:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>11:00 am</p>
-                                <div class="calendar-box break-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Break</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>11:00 - 12:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>11:30 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>History</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
+    </div>
+    <footer>
+        <p>Copyright &copy; {{ date('Y') }} SmartEdu.</p>
+    </footer>
+</div>

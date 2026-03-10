@@ -54,6 +54,9 @@
                         <p class="text-muted mb-0">Administrateur</p>
                     </div>
                 </div>
+                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profilModal">
+                    <i class="fas fa-user-edit me-1"></i> Mon profil
+                </a>
                 <form action="{{ route('logout') }}" method="POST" id="logout-header-form">
                     @csrf
                     <a class="dropdown-item" href="#" onclick="document.getElementById('logout-header-form').submit();">

@@ -14,6 +14,7 @@
 
          <!-- Section loader -->
          @include("sections.admin.baseContent")
+    @include("sections.admin.profilModal")
 
     </div>
     <!-- ================== Section JS ================== -->

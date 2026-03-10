@@ -18,10 +18,13 @@ Route::redirect('/', '/login');
 require __DIR__.'/auth.php';
 
 // ─── Administration ───────────────────────────────────────────────────────────
-Route::prefix('admin')->middleware('auth')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/dashboard', [AdministrateurController::class, 'dashboard'])
         ->name('admin.dashboard');
+
+    Route::put('/profil', [AdministrateurController::class, 'updateProfil'])
+        ->name('admin.profil.update');
 
     // Utilisateurs
     Route::get('/users',                   [UtilisateurController::class,    'index']  )->name('users.index');
@@ -88,22 +91,32 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 });
 
 // ─── Enseignant ───────────────────────────────────────────────────────────────
-Route::prefix('enseignant')->middleware('auth')->group(function () {
+Route::prefix('enseignant')->middleware(['auth', 'role:enseignant'])->group(function () {
 
     Route::get('/dashboard', [EnseignantController::class, 'dashboard'])
         ->name('enseignant.dashboard');
 
-    // Évaluations (l'enseignant crée/modifie ses propres évaluations)
+    // Pages dédiées enseignant
+    Route::get('/cours',       [EnseignantController::class, 'mesCours']       )->name('enseignant.cours');
+    Route::get('/evaluations', [EnseignantController::class, 'mesEvaluations'] )->name('enseignant.evaluations');
+    Route::get('/notes',       [EnseignantController::class, 'mesNotes']       )->name('enseignant.notes');
+    Route::get('/presences',   [EnseignantController::class, 'mesPresences']   )->name('enseignant.presences');
+    Route::get('/classes',     [EnseignantController::class, 'mesClasses']     )->name('enseignant.classes');
+    Route::get('/etudiants',   [EnseignantController::class, 'mesEtudiants']   )->name('enseignant.etudiants');
+
+    Route::put('/profil', [EnseignantController::class, 'updateProfil'])->name('enseignant.profil.update');
+
+    // CRUD Évaluations
     Route::post('/evaluations',                [EvaluationController::class, 'store']  )->name('enseignant.evaluations.store');
     Route::put('/evaluations/{evaluation}',    [EvaluationController::class, 'update'] )->name('enseignant.evaluations.update');
     Route::delete('/evaluations/{evaluation}', [EvaluationController::class, 'destroy'])->name('enseignant.evaluations.destroy');
 
-    // Notes (l'enseignant attribue les notes)
+    // CRUD Notes
     Route::post('/notes',          [NoteController::class, 'store']  )->name('enseignant.notes.store');
     Route::put('/notes/{note}',    [NoteController::class, 'update'] )->name('enseignant.notes.update');
     Route::delete('/notes/{note}', [NoteController::class, 'destroy'])->name('enseignant.notes.destroy');
 
-    // Présences (l'enseignant saisit les présences)
+    // CRUD Présences
     Route::post('/presences',               [PresenceController::class, 'store']  )->name('enseignant.presences.store');
     Route::put('/presences/{presence}',     [PresenceController::class, 'update'] )->name('enseignant.presences.update');
     Route::delete('/presences/{presence}',  [PresenceController::class, 'destroy'])->name('enseignant.presences.destroy');
@@ -111,10 +124,16 @@ Route::prefix('enseignant')->middleware('auth')->group(function () {
 });
 
 // ─── Étudiant ─────────────────────────────────────────────────────────────────
-Route::prefix('etudiant')->middleware('auth')->group(function () {
+Route::prefix('etudiant')->middleware(['auth', 'role:etudiant'])->group(function () {
 
     Route::get('/dashboard', [EtudiantController::class, 'dashboard'])
         ->name('etudiant.dashboard');
+
+    Route::get('/notes',     [EtudiantController::class, 'mesNotes']    )->name('etudiant.notes');
+    Route::get('/cours',     [EtudiantController::class, 'mesCours']    )->name('etudiant.cours');
+    Route::get('/presences', [EtudiantController::class, 'mesPresences'])->name('etudiant.presences');
+    Route::get('/paiements', [EtudiantController::class, 'mesPaiements'])->name('etudiant.paiements');
+    Route::get('/classe',    [EtudiantController::class, 'maClasse']    )->name('etudiant.classe');
 
     Route::put('/profil', [EtudiantController::class, 'updateProfil'])
         ->name('etudiant.profil.update');

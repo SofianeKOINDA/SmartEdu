@@ -26,7 +26,9 @@ class EtudiantController extends Controller
             abort(403, 'Accès réservé aux étudiants connectés.');
         }
 
-        $etudiant = $user->etudiant;
+        $etudiant = $user->etudiant()->with([
+            'classe.cours' => fn($q) => $q->with(['enseignant.user'])->withCount('evaluations'),
+        ])->first();
 
         $notes = $etudiant->notes()
             ->with('evaluation.cours')
@@ -36,6 +38,7 @@ class EtudiantController extends Controller
         $evaluations = Evaluation::whereHas('cours.classes', function ($q) use ($etudiant) {
                 $q->where('classes.id', $etudiant->classe_id);
             })
+            ->with('cours')
             ->where('date_limite', '>=', now())
             ->orderBy('date_limite')
             ->get();
@@ -85,7 +88,53 @@ class EtudiantController extends Controller
         return redirect()->back()->with('success', 'Profil mis à jour avec succès.');
     }
 
-    //  Admin : gestion des étudiants 
+    // ─── Pages dédiées étudiant ───────────────────────────────────────────────
+
+    public function mesNotes()
+    {
+        $etudiant = Auth::user()->etudiant;
+        if (!$etudiant) abort(403);
+        $notes = $etudiant->notes()->with('evaluation.cours')->latest()->get();
+        return view('pages.etudiant.Note.liste', compact('etudiant', 'notes'));
+    }
+
+    public function mesCours()
+    {
+        $etudiant = Auth::user()->etudiant;
+        if (!$etudiant) abort(403);
+        $cours = $etudiant->classe
+            ? $etudiant->classe->cours()->with(['enseignant.user'])->withCount('evaluations')->get()
+            : collect();
+        return view('pages.etudiant.Cours.liste', compact('etudiant', 'cours'));
+    }
+
+    public function mesPresences()
+    {
+        $etudiant = Auth::user()->etudiant;
+        if (!$etudiant) abort(403);
+        $presences = $etudiant->presences()->with('cours')->orderBy('date', 'desc')->get();
+        return view('pages.etudiant.Presence.liste', compact('etudiant', 'presences'));
+    }
+
+    public function mesPaiements()
+    {
+        $etudiant = Auth::user()->etudiant;
+        if (!$etudiant) abort(403);
+        $paiements = $etudiant->paiements()->orderBy('date', 'desc')->get();
+        return view('pages.etudiant.Paiement.liste', compact('etudiant', 'paiements'));
+    }
+
+    public function maClasse()
+    {
+        $etudiant = Auth::user()->etudiant;
+        if (!$etudiant) abort(403);
+        $classe = $etudiant->classe
+            ? $etudiant->classe->load(['etudiants.user', 'cours.enseignant.user'])
+            : null;
+        return view('pages.etudiant.Classe.liste', compact('etudiant', 'classe'));
+    }
+
+    //  Admin : gestion des étudiants
 
     /**
      * Liste de tous les étudiants (vue admin).

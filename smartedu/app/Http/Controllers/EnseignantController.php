@@ -9,6 +9,7 @@ use App\Models\Note;
 use App\Models\Presence;
 use App\Http\Requests\StoreEnseignantRequest;
 use App\Http\Requests\UpdateEnseignantRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -16,8 +17,7 @@ use Illuminate\Support\Facades\Hash;
 class EnseignantController extends Controller
 {
     /**
-     * Dashboard de l'enseignant connecté :
-     * ses cours, classes, évaluations, notes récentes, présences récentes.
+     * Dashboard de l'enseignant connecté.
      */
     public function dashboard()
     {
@@ -55,7 +55,6 @@ class EnseignantController extends Controller
             ->take(20)
             ->get();
 
-        // Étudiants de toutes ses classes
         $classeIds = $classes->pluck('id');
         $etudiants = Etudiant::whereIn('classe_id', $classeIds)
             ->with(['user', 'classe'])
@@ -67,20 +66,136 @@ class EnseignantController extends Controller
         ));
     }
 
-    // ─── Admin : gestion des enseignants ─────────────────────────────────────
-
     /**
-     * Liste de tous les enseignants (vue admin).
+     * L'enseignant met à jour son profil.
      */
+    public function updateProfil(Request $request)
+    {
+        $request->validate([
+            'nom'          => ['required', 'string', 'max:100'],
+            'prenom'       => ['required', 'string', 'max:100'],
+            'photo_profil' => ['nullable', 'image', 'max:5048'],
+        ]);
+
+        $data = ['nom' => $request->nom, 'prenom' => $request->prenom];
+
+        if ($request->hasFile('photo_profil')) {
+            $data['photo_profil'] = $request->file('photo_profil')->store('profils', 'public');
+        }
+
+        \App\Models\User::where('id', Auth::id())->update($data);
+
+        return redirect()->back()->with('success', 'Profil mis à jour avec succès.');
+    }
+
+    // ─── Pages dédiées enseignant ──────────────────────────────────────────────
+
+    public function mesCours()
+    {
+        $enseignant = Auth::user()->enseignant;
+        if (!$enseignant) abort(403);
+
+        $cours = $enseignant->cours()
+            ->with(['classes'])
+            ->withCount(['evaluations', 'presences'])
+            ->get();
+
+        return view('pages.enseignant.Cours.liste', compact('enseignant', 'cours'));
+    }
+
+    public function mesEvaluations()
+    {
+        $enseignant = Auth::user()->enseignant;
+        if (!$enseignant) abort(403);
+
+        $coursIds   = $enseignant->cours()->pluck('id');
+        $evaluations = Evaluation::whereIn('cours_id', $coursIds)
+            ->with('cours')
+            ->orderBy('date_limite')
+            ->get();
+        $cours = $enseignant->cours()->get();
+
+        return view('pages.enseignant.Evaluation.liste', compact('enseignant', 'evaluations', 'cours'));
+    }
+
+    public function mesNotes()
+    {
+        $enseignant = Auth::user()->enseignant;
+        if (!$enseignant) abort(403);
+
+        $coursIds      = $enseignant->cours()->pluck('id');
+        $evaluationIds = Evaluation::whereIn('cours_id', $coursIds)->pluck('id');
+
+        $notes = Note::whereIn('evaluation_id', $evaluationIds)
+            ->with(['etudiant.user', 'evaluation.cours'])
+            ->latest()
+            ->get();
+
+        $evaluations = Evaluation::whereIn('cours_id', $coursIds)->with('cours')->get();
+
+        $classeIds = $enseignant->cours()->with('classes')->get()
+            ->flatMap->classes->unique('id')->pluck('id');
+        $etudiants = Etudiant::whereIn('classe_id', $classeIds)->with('user')->get();
+
+        return view('pages.enseignant.Note.liste', compact('enseignant', 'notes', 'evaluations', 'etudiants'));
+    }
+
+    public function mesPresences()
+    {
+        $enseignant = Auth::user()->enseignant;
+        if (!$enseignant) abort(403);
+
+        $coursIds  = $enseignant->cours()->pluck('id');
+        $presences = Presence::whereIn('cours_id', $coursIds)
+            ->with(['etudiant.user', 'cours'])
+            ->orderBy('date', 'desc')
+            ->get();
+
+        $cours = $enseignant->cours()->get();
+
+        $classeIds = $enseignant->cours()->with('classes')->get()
+            ->flatMap->classes->unique('id')->pluck('id');
+        $etudiants = Etudiant::whereIn('classe_id', $classeIds)->with('user')->get();
+
+        return view('pages.enseignant.Presence.liste', compact('enseignant', 'presences', 'cours', 'etudiants'));
+    }
+
+    public function mesClasses()
+    {
+        $enseignant = Auth::user()->enseignant;
+        if (!$enseignant) abort(403);
+
+        $classes = $enseignant->cours()
+            ->with('classes.etudiants.user')
+            ->get()
+            ->flatMap->classes
+            ->unique('id');
+
+        return view('pages.enseignant.Classe.liste', compact('enseignant', 'classes'));
+    }
+
+    public function mesEtudiants()
+    {
+        $enseignant = Auth::user()->enseignant;
+        if (!$enseignant) abort(403);
+
+        $classeIds = $enseignant->cours()->with('classes')->get()
+            ->flatMap->classes->unique('id')->pluck('id');
+        $etudiants = Etudiant::whereIn('classe_id', $classeIds)
+            ->with(['user', 'classe'])
+            ->get();
+
+        return view('pages.enseignant.Etudiant.liste', compact('enseignant', 'etudiants'));
+    }
+
+    // ─── Admin : gestion des enseignants ──────────────────────────────────────
+
     public function index()
     {
         $enseignants = Enseignant::with(['user', 'cours'])->latest()->paginate(15);
         return view('pages.admin.Enseignant.liste', compact('enseignants'));
     }
 
-    /**
-     * Créer un enseignant (User + Enseignant) via modal.
-     */
     public function store(StoreEnseignantRequest $request)
     {
         DB::transaction(function () use ($request) {
@@ -103,9 +218,6 @@ class EnseignantController extends Controller
         return redirect()->back()->with('success', 'Enseignant créé avec succès.');
     }
 
-    /**
-     * Mettre à jour un enseignant via modal.
-     */
     public function update(UpdateEnseignantRequest $request, Enseignant $enseignant)
     {
         DB::transaction(function () use ($request, $enseignant) {
@@ -129,12 +241,9 @@ class EnseignantController extends Controller
         return redirect()->back()->with('success', 'Enseignant mis à jour avec succès.');
     }
 
-    /**
-     * Supprimer un enseignant (et son user) via modal.
-     */
     public function destroy(Enseignant $enseignant)
     {
-        $enseignant->user->delete(); // cascade supprime l'enseignant
+        $enseignant->user->delete();
         return redirect()->back()->with('success', 'Enseignant supprimé avec succès.');
     }
 }

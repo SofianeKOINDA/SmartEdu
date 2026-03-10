@@ -1,442 +1,353 @@
 <div class="page-wrapper">
     <div class="content container-fluid">
 
-        <!-- ===== Page Header ===== -->
+        {{-- ===== Page Header ===== --}}
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
-                        <h3 class="page-title">Welcome Bruklin!</h3>
+                        <h3 class="page-title">Bonjour, {{ auth()->user()->prenom }} !</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                            <li class="breadcrumb-item active">Student</li>
+                            <li class="breadcrumb-item"><a href="{{ route('etudiant.dashboard') }}">Accueil</a></li>
+                            <li class="breadcrumb-item active">Dashboard Étudiant</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== Stats Cards ===== -->
+        {{-- Flash messages --}}
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        {{-- ===== Stats Cards ===== --}}
+        @php
+            $nbCours      = $etudiant->classe ? $etudiant->classe->cours->count() : 0;
+            $nbNotes      = $notes->count();
+            $nbEvals      = $evaluations->count();
+            $nbPresences  = $presences->count();
+            $nbPresent    = $presences->where('statut', 'present')->count();
+            $tauxPresence = $nbPresences > 0 ? round(($nbPresent / $nbPresences) * 100) : 0;
+        @endphp
+
         <div class="row">
 
-            <!-- All Courses -->
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>All Courses</h6>
-                                <h3>04/06</h3>
+                                <h6>Mes Cours</h6>
+                                <h3>{{ $nbCours }}</h3>
                             </div>
                             <div class="db-icon">
-                                <img src="assets/img/icons/teacher-icon-01.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/teacher-icon-01.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- All Projects -->
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>All Projects</h6>
-                                <h3>40/60</h3>
+                                <h6>Mes Notes</h6>
+                                <h3>{{ $nbNotes }}</h3>
                             </div>
                             <div class="db-icon">
-                                <img src="assets/img/icons/teacher-icon-02.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/teacher-icon-02.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Test Attended -->
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Test Attended</h6>
-                                <h3>30/50</h3>
+                                <h6>Évaluations à venir</h6>
+                                <h3>{{ $nbEvals }}</h3>
                             </div>
                             <div class="db-icon">
-                                <img src="assets/img/icons/student-icon-01.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/student-icon-01.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Test Passed -->
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card bg-comman w-100">
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Test Passed</h6>
-                                <h3>15/20</h3>
+                                <h6>Taux de présence</h6>
+                                <h3>{{ $tauxPresence }}%</h3>
                             </div>
                             <div class="db-icon">
-                                <img src="assets/img/icons/student-icon-02.svg" alt="Dashboard Icon">
+                                <img src="{{ asset('templates/assets/img/icons/student-icon-02.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div><!-- /.row stats cards -->
+        </div>{{-- /.row stats --}}
 
-        <!-- ===== Main Content Row ===== -->
+        {{-- ===== Contenu Principal ===== --}}
         <div class="row">
 
-            <!-- Left Column (8/12) -->
-            <div class="col-12 col-lg-12 col-xl-8">
+            {{-- Colonne gauche (8/12) --}}
+            <div class="col-12 col-xl-8">
 
-                <!-- Today's Lesson -->
-                <div class="card flex-fill comman-shadow">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col-6">
-                                <h5 class="card-title">Today's Lesson</h5>
-                            </div>
-                            <div class="col-6">
-                                <ul class="chart-list-out">
-                                    <li>
-                                        <span class="circle-blue"></span>
-                                        <span class="circle-gray"></span>
-                                        <span class="circle-gray"></span>
+                {{-- === Évaluations à venir === --}}
+                <div class="card flex-fill comman-shadow" id="mes-evaluations">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clipboard-list me-2 text-primary"></i>Évaluations à venir
+                        </h5>
+                        <span class="badge bg-primary">{{ $nbEvals }}</span>
+                    </div>
+                    <div class="card-body">
+                        @forelse($evaluations as $eval)
+                        <div class="feed-item d-flex align-items-center py-2 border-bottom">
+                            <div class="dolor-activity flex-grow-1">
+                                <span class="feed-text1">
+                                    <strong>{{ $eval->titre }}</strong>
+                                    <span class="badge bg-secondary ms-2">{{ $eval->type }}</span>
+                                </span>
+                                <ul class="teacher-date-list mt-1">
+                                    <li><i class="fas fa-book me-1 text-muted"></i>{{ $eval->cours->titre ?? '—' }}</li>
+                                    <li class="ms-3">|</li>
+                                    <li class="ms-3"><i class="fas fa-calendar-alt me-1 text-muted"></i>
+                                        {{ \Carbon\Carbon::parse($eval->date_limite)->format('d/m/Y à H:i') }}
                                     </li>
-                                    <li class="lesson-view-all"><a href="#">View All</a></li>
-                                    <li class="star-menus">
-                                        <a href="javascript:;"><i class="fas fa-ellipsis-v"></i></a>
-                                    </li>
+                                    <li class="ms-3">|</li>
+                                    <li class="ms-3"><i class="fas fa-weight me-1 text-muted"></i>Coeff. {{ $eval->coefficient }}</li>
                                 </ul>
                             </div>
+                            <div class="activity-btns ms-3">
+                                @php $diff = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($eval->date_limite), false); @endphp
+                                @if($diff <= 3)
+                                    <span class="badge bg-danger">Dans {{ $diff }}j</span>
+                                @elseif($diff <= 7)
+                                    <span class="badge bg-warning text-dark">Dans {{ $diff }}j</span>
+                                @else
+                                    <span class="badge bg-success">Dans {{ $diff }}j</span>
+                                @endif
+                            </div>
+                        </div>
+                        @empty
+                        <p class="text-muted text-center py-3">Aucune évaluation à venir.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- === Mes Dernières Notes === --}}
+                <div class="card flex-fill comman-shadow" id="mes-notes">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-star me-2 text-warning"></i>Mes Dernières Notes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center table-borderless table-striped">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Évaluation</th>
+                                        <th>Cours</th>
+                                        <th class="text-center">Note</th>
+                                        <th>Semestre</th>
+                                        <th>Commentaire</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($notes->take(10) as $note)
+                                    <tr>
+                                        <td>{{ $note->evaluation->titre ?? '—' }}</td>
+                                        <td>{{ $note->evaluation->cours->titre ?? '—' }}</td>
+                                        <td class="text-center">
+                                            <span class="badge {{ $note->valeur >= 10 ? 'bg-success' : 'bg-danger' }} fs-6">
+                                                {{ number_format($note->valeur, 2) }}/20
+                                            </span>
+                                        </td>
+                                        <td>{{ $note->semestre }}</td>
+                                        <td class="text-muted">{{ $note->commentaire ?? '—' }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Aucune note enregistrée.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="dash-circle">
-                        <div class="row">
+                </div>
 
-                            <!-- Circle Progress -->
-                            <div class="col-lg-3 col-md-3 dash-widget1">
-                                <div class="circle-bar circle-bar2">
-                                    <div class="circle-graph2" data-percent="80">
-                                        <b>80%</b>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Lesson Details Col 1 -->
-                            <div class="col-lg-3 col-md-3">
-                                <div class="dash-details">
-                                    <div class="lesson-activity">
-                                        <div class="lesson-imgs">
-                                            <img src="assets/img/icons/lesson-icon-01.svg" alt="">
-                                        </div>
-                                        <div class="views-lesson">
-                                            <h5>Class</h5>
-                                            <h4>Electrical Engg</h4>
-                                        </div>
-                                    </div>
-                                    <div class="lesson-activity">
-                                        <div class="lesson-imgs">
-                                            <img src="assets/img/icons/lesson-icon-02.svg" alt="">
-                                        </div>
-                                        <div class="views-lesson">
-                                            <h5>Lessons</h5>
-                                            <h4>5 Lessons</h4>
-                                        </div>
-                                    </div>
-                                    <div class="lesson-activity">
-                                        <div class="lesson-imgs">
-                                            <img src="assets/img/icons/lesson-icon-03.svg" alt="">
-                                        </div>
-                                        <div class="views-lesson">
-                                            <h5>Time</h5>
-                                            <h4>Lessons</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Lesson Details Col 2 -->
-                            <div class="col-lg-3 col-md-3">
-                                <div class="dash-details">
-                                    <div class="lesson-activity">
-                                        <div class="lesson-imgs">
-                                            <img src="assets/img/icons/lesson-icon-04.svg" alt="">
-                                        </div>
-                                        <div class="views-lesson">
-                                            <h5>Asignment</h5>
-                                            <h4>5 Asignment</h4>
-                                        </div>
-                                    </div>
-                                    <div class="lesson-activity">
-                                        <div class="lesson-imgs">
-                                            <img src="assets/img/icons/lesson-icon-05.svg" alt="">
-                                        </div>
-                                        <div class="views-lesson">
-                                            <h5>Staff</h5>
-                                            <h4>John Doe</h4>
-                                        </div>
-                                    </div>
-                                    <div class="lesson-activity">
-                                        <div class="lesson-imgs">
-                                            <img src="assets/img/icons/lesson-icon-06.svg" alt="">
-                                        </div>
-                                        <div class="views-lesson">
-                                            <h5>Lesson Learned</h5>
-                                            <h4>10/50</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="col-lg-3 col-md-3 d-flex align-items-center justify-content-center">
-                                <div class="skip-group">
-                                    <button type="submit" class="btn btn-info skip-btn">Skip</button>
-                                    <button type="submit" class="btn btn-info continue-btn">Continue</button>
-                                </div>
-                            </div>
-
-                        </div>
+                {{-- === Historique des Présences === --}}
+                <div class="card flex-fill comman-shadow" id="mes-presences">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-calendar-check me-2 text-success"></i>Historique des Présences
+                        </h5>
+                        <span class="badge bg-success">{{ $tauxPresence }}% présent</span>
                     </div>
-                </div><!-- /.card today's lesson -->
-
-                <div class="row">
-
-                    <!-- Learning Activity -->
-                    <div class="col-12 col-lg-12 col-xl-12 d-flex">
-                        <div class="card flex-fill comman-shadow">
-                            <div class="card-header">
-                                <div class="row align-items-center">
-                                    <div class="col-6">
-                                        <h5 class="card-title">Learning Activity</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <ul class="chart-list-out">
-                                            <li><span class="circle-blue"></span>Teacher</li>
-                                            <li><span class="circle-green"></span>Student</li>
-                                            <li class="star-menus">
-                                                <a href="javascript:;"><i class="fas fa-ellipsis-v"></i></a>
+                    <div class="card-body">
+                        <div class="teaching-card">
+                            <ul class="activity-feed">
+                                @forelse($presences->take(8) as $presence)
+                                <li class="feed-item d-flex align-items-center">
+                                    <div class="dolor-activity flex-grow-1">
+                                        <span class="feed-text1">
+                                            <strong>{{ $presence->cours->titre ?? '—' }}</strong>
+                                        </span>
+                                        <ul class="teacher-date-list">
+                                            <li><i class="fas fa-calendar-alt me-2"></i>
+                                                {{ \Carbon\Carbon::parse($presence->date)->format('d/m/Y') }}
                                             </li>
                                         </ul>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div id="apexcharts-area"></div>
-                            </div>
+                                    <div class="activity-btns ms-auto {{ $presence->statut === 'present' ? 'complete' : '' }}">
+                                        @if($presence->statut === 'present')
+                                            <span class="badge bg-success px-3 py-2">Présent</span>
+                                        @elseif($presence->statut === 'retard')
+                                            <span class="badge bg-warning text-dark px-3 py-2">Retard</span>
+                                        @else
+                                            <span class="badge bg-danger px-3 py-2">Absent</span>
+                                        @endif
+                                    </div>
+                                </li>
+                                @empty
+                                <li class="text-muted text-center py-3">Aucune présence enregistrée.</li>
+                                @endforelse
+                            </ul>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Teaching History -->
-                    <div class="col-12 col-lg-12 col-xl-12 d-flex">
-                        <div class="card flex-fill comman-shadow">
-                            <div class="card-header d-flex align-items-center">
-                                <h5 class="card-title">Teaching History</h5>
-                                <ul class="chart-list-out student-ellips">
-                                    <li class="star-menus">
-                                        <a href="javascript:;"><i class="fas fa-ellipsis-v"></i></a>
-                                    </li>
-                                </ul>
+            </div>{{-- /.col gauche --}}
+
+            {{-- Colonne droite (4/12) --}}
+            <div class="col-12 col-xl-4 d-flex flex-column gap-3">
+
+                {{-- === Mes Cours === --}}
+                <div class="card comman-shadow" id="mes-cours">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-book-reader me-2 text-info"></i>Mes Cours
+                        </h5>
+                        @if($etudiant->classe)
+                        <span class="badge bg-info">{{ $etudiant->classe->nom }}</span>
+                        @endif
+                    </div>
+                    <div class="card-body p-0">
+                        @if($etudiant->classe && $etudiant->classe->cours->count() > 0)
+                            @foreach($etudiant->classe->cours as $cours)
+                            <div class="d-flex align-items-center px-3 py-2 border-bottom">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">{{ $cours->titre }}</h6>
+                                    <small class="text-muted">
+                                        {{ $cours->type }} —
+                                        {{ $cours->enseignant->user->prenom ?? '' }} {{ $cours->enseignant->user->nom ?? '—' }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-light text-dark">{{ $cours->evaluations_count ?? 0 }} éval.</span>
                             </div>
-                            <div class="card-body">
-                                <div class="teaching-card">
+                            @endforeach
+                        @else
+                            <p class="text-muted text-center py-3 px-3">Aucun cours associé à votre classe.</p>
+                        @endif
+                    </div>
+                </div>
 
-                                    <ul class="steps-history">
-                                        <li>Sep22</li>
-                                        <li>Sep23</li>
-                                        <li>Sep24</li>
-                                    </ul>
-
-                                    <ul class="activity-feed">
-
-                                        <!-- Mathematics -->
-                                        <li class="feed-item d-flex align-items-center">
-                                            <div class="dolor-activity">
-                                                <span class="feed-text1"><a>Mathematics</a></span>
-                                                <ul class="teacher-date-list">
-                                                    <li><i class="fas fa-calendar-alt me-2"></i>September 5, 2022</li>
-                                                    <li>|</li>
-                                                    <li><i class="fas fa-clock me-2"></i>09:00 am - 10:00 am (60 Minutes)</li>
-                                                </ul>
-                                            </div>
-                                            <div class="activity-btns ms-auto">
-                                                <button type="submit" class="btn btn-info">In Progress</button>
-                                            </div>
-                                        </li>
-
-                                        <!-- Geography -->
-                                        <li class="feed-item d-flex align-items-center">
-                                            <div class="dolor-activity">
-                                                <span class="feed-text1"><a>Geography</a></span>
-                                                <ul class="teacher-date-list">
-                                                    <li><i class="fas fa-calendar-alt me-2"></i>September 5, 2022</li>
-                                                    <li>|</li>
-                                                    <li><i class="fas fa-clock me-2"></i>09:00 am - 10:00 am (60 Minutes)</li>
-                                                </ul>
-                                            </div>
-                                            <div class="activity-btns complete ms-auto">
-                                                <button type="submit" class="btn btn-info">Completed</button>
-                                            </div>
-                                        </li>
-
-                                        <!-- Botony -->
-                                        <li class="feed-item d-flex align-items-center">
-                                            <div class="dolor-activity">
-                                                <span class="feed-text1"><a>Botony</a></span>
-                                                <ul class="teacher-date-list">
-                                                    <li><i class="fas fa-calendar-alt me-2"></i>September 5, 2022</li>
-                                                    <li>|</li>
-                                                    <li><i class="fas fa-clock me-2"></i>09:00 am - 10:00 am (60 Minutes)</li>
-                                                </ul>
-                                            </div>
-                                            <div class="activity-btns ms-auto">
-                                                <button type="submit" class="btn btn-info">In Progress</button>
-                                            </div>
-                                        </li>
-
-                                    </ul>
+                {{-- === Mes Paiements === --}}
+                <div class="card comman-shadow" id="mes-paiements">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-file-invoice-dollar me-2 text-success"></i>Mes Paiements
+                        </h5>
+                        <a href="#" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                    </div>
+                    <div class="calendar-info">
+                        @forelse($paiements->take(6) as $paiement)
+                        <div class="calendar-details px-3 py-2">
+                            <div class="calendar-box {{ $paiement->statut === 'valide' ? 'normal-bg' : ($paiement->statut === 'rejete' ? 'break-bg' : '') }}">
+                                <div class="calandar-event-name">
+                                    <h4>{{ number_format($paiement->montant, 0, ',', ' ') }} FCFA</h4>
+                                    <h5>{{ $paiement->type }} — {{ $paiement->methode }}</h5>
+                                </div>
+                                <div class="d-flex flex-column align-items-end">
+                                    <span class="text-muted small">{{ \Carbon\Carbon::parse($paiement->date)->format('d/m/Y') }}</span>
+                                    @if($paiement->statut === 'valide')
+                                        <span class="badge bg-success mt-1">Validé</span>
+                                    @elseif($paiement->statut === 'rejete')
+                                        <span class="badge bg-danger mt-1">Rejeté</span>
+                                    @else
+                                        <span class="badge bg-warning text-dark mt-1">En attente</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
+                        @empty
+                        <p class="text-muted text-center py-3 px-3">Aucun paiement enregistré.</p>
+                        @endforelse
                     </div>
+                </div>
 
-                </div><!-- /.row -->
-            </div><!-- /.col left (8/12) -->
+            </div>{{-- /.col droite --}}
 
-            <!-- Right Column (4/12) - Calendar -->
-            <div class="col-12 col-lg-12 col-xl-4 d-flex">
-                <div class="card flex-fill comman-shadow">
-                    <div class="card-body">
+        </div>{{-- /.row principal --}}
 
-                        <div id="calendar-doctor" class="calendar-container"></div>
+    </div>{{-- /.content --}}
 
-                        <div class="calendar-info calendar-info1">
+    <footer>
+        <p>Copyright &copy; {{ date('Y') }} SmartEdu.</p>
+    </footer>
 
-                            <div class="up-come-header">
-                                <h2>Upcoming Events</h2>
-                                <span>
-                                    <a href="javascript:;"><i class="feather-plus"></i></a>
-                                </span>
-                            </div>
+</div>{{-- /.page-wrapper --}}
 
-                            <!-- Event Date 1 -->
-                            <div class="upcome-event-date">
-                                <h3>10 Jan</h3>
-                                <span><i class="fas fa-ellipsis-h"></i></span>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>08:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Botony</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>08:00 - 09:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>09:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Botony</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>09:00 - 10:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>10:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Botony</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>10:00 - 11:00 am</span>
-                                </div>
-                            </div>
-
-                            <!-- Event Date 2 -->
-                            <div class="upcome-event-date">
-                                <h3>10 Jan</h3>
-                                <span><i class="fas fa-ellipsis-h"></i></span>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>08:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>English</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>08:00 - 09:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>09:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Mathematics</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>09:00 - 10:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>10:00 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>History</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>10:00 - 11:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>11:00 am</p>
-                                <div class="calendar-box break-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>Break</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>11:00 - 12:00 am</span>
-                                </div>
-                            </div>
-
-                            <div class="calendar-details">
-                                <p>11:30 am</p>
-                                <div class="calendar-box normal-bg">
-                                    <div class="calandar-event-name">
-                                        <h4>History</h4>
-                                        <h5>Lorem ipsum sit amet</h5>
-                                    </div>
-                                    <span>11:30 - 12:00 am</span>
-                                </div>
-                            </div>
-
-                        </div><!-- /.calendar-info -->
-                    </div><!-- /.card-body -->
-                </div><!-- /.card -->
-            </div><!-- /.col right (4/12) -->
-
-        </div><!-- /.row main content -->
-
-        <!-- ===== Footer ===== -->
-        <footer>
-            <p>Copyright © 2022 Dreamguys.</p>
-        </footer>
-
-    </div><!-- /.content -->
-</div><!-- /.page-wrapper -->
+{{-- ===== Modal Modifier Profil ===== --}}
+<div class="modal fade" id="profilModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Modifier mon profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('etudiant.profil.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom <span class="text-danger">*</span></label>
+                        <input type="text" name="nom" class="form-control"
+                            value="{{ auth()->user()->nom }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prénom <span class="text-danger">*</span></label>
+                        <input type="text" name="prenom" class="form-control"
+                            value="{{ auth()->user()->prenom }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Photo de profil</label>
+                        <input type="file" name="photo_profil" class="form-control" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
