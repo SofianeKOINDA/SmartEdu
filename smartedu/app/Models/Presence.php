@@ -2,33 +2,45 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Presence extends Model
 {
-    protected $table = 'presences';
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'etudiant_matricule',
+        'tenant_id',
         'cours_id',
-        'date',
+        'etudiant_id',
+        'saisi_par',
+        'date_seance',
         'statut',
+        'observation',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'date' => 'date',
-        ];
-    }
+    protected $casts = [
+        'date_seance' => 'date',
+    ];
 
-    public function etudiant()
+    public function tenant()
     {
-        return $this->belongsTo(Etudiant::class, 'etudiant_matricule', 'matricule');
+        return $this->belongsTo(Tenant::class);
     }
 
     public function cours()
     {
-        return $this->belongsTo(Cours::class, 'cours_id');
+        return $this->belongsTo(Cours::class);
+    }
+
+    public function etudiant()
+    {
+        return $this->belongsTo(Etudiant::class);
+    }
+
+    public function saisiPar()
+    {
+        return $this->belongsTo(User::class, 'saisi_par');
     }
 }

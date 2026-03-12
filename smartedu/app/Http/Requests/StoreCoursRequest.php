@@ -8,25 +8,18 @@ class StoreCoursRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', \App\Models\Cours::class);
     }
 
     public function rules(): array
     {
         return [
-            'titre'               => ['required', 'string', 'max:200'],
-            'enseignant_matricule'=> ['required', 'string', 'exists:enseignants,matricule_enseignant'],
-            'type'                => ['required', 'string'],
-            'description'         => ['nullable', 'string'],
-        ];
-    }
-    public function messages()
-    {
-        return [
-            'titre.required' => 'Le titre du cours est requis.',
-            'enseignant_matricule.required' => 'Le matricule de l\'enseignant est requis.',
-            'type.required' => 'Le type de cours est requis.',
-            'type.string' => 'Le type de cours doit être une chaîne de caractères.',
+            'ue_id'          => ['required', 'exists:ues,id'],
+            'enseignant_id'  => ['nullable', 'exists:enseignants,id'],
+            'intitule'       => ['required', 'string', 'max:255'],
+            'code'           => ['nullable', 'string', 'max:20'],
+            'coefficient'    => ['required', 'numeric', 'min:0'],
+            'volume_horaire' => ['required', 'integer', 'min:0'],
         ];
     }
 }

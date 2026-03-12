@@ -16,9 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
 
-        // Exclure le webhook PayTech du CSRF
+        // Exclure le webhook PayTech du CSRF (règle DIRECTIVES.md)
         $middleware->validateCsrfTokens(except: [
-            'paytech/ipn',
+            'webhooks/paytech',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

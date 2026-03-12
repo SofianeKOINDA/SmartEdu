@@ -6,20 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreEtudiantRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return $this->user()->can('create', \App\Models\Etudiant::class);
+    }
 
     public function rules(): array
     {
         return [
-            // Champs User
-            'nom'            => ['required', 'string', 'max:100'],
-            'prenom'         => ['required', 'string', 'max:100'],
-            'email'          => ['required', 'email', 'max:150', 'unique:users,email'],
-            'password'       => ['required', 'string', 'min:8', 'confirmed'],
-            // Champs Etudiant
-            'matricule'      => ['required', 'string', 'max:50', 'unique:etudiants,matricule'],
-            'date_naissance' => ['nullable', 'date'],
-            'classe_id'      => ['nullable', 'integer', 'exists:classes,id'],
+            'user_id'          => ['required', 'exists:users,id'],
+            'promotion_id'     => ['required', 'exists:promotions,id'],
+            'numero_etudiant'  => ['nullable', 'string', 'max:50'],
+            'date_naissance'   => ['nullable', 'date'],
+            'lieu_naissance'   => ['nullable', 'string', 'max:255'],
+            'nationalite'      => ['nullable', 'string', 'max:100'],
         ];
     }
 }

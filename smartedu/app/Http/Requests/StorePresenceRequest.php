@@ -8,25 +8,17 @@ class StorePresenceRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', \App\Models\Presence::class);
     }
 
     public function rules(): array
     {
         return [
-            'etudiant_matricule' => ['required', 'string', 'exists:etudiants,matricule'],
-            'cours_id'           => ['required', 'integer', 'exists:cours,id'],
-            'date'               => ['required', 'date'],
-            'statut'             => ['required', 'in:present,absent,retard,justifie'],
-        ];
-    }
-    public function messages()
-    {
-        return [
-            'etudiant_matricule.required' => 'Le matricule de l\'étudiant est requis.',
-            'cours_id.required' => 'L\'ID du cours est requis.',
-            'date.required' => 'La date est requise.',
-            'statut.required' => 'Le statut est requis.',
+            'cours_id'    => ['required', 'exists:cours,id'],
+            'etudiant_id' => ['required', 'exists:etudiants,id'],
+            'date_seance' => ['required', 'date'],
+            'statut'      => ['required', 'in:present,absent,retard,excuse'],
+            'observation' => ['nullable', 'string'],
         ];
     }
 }
