@@ -2,51 +2,92 @@
 
 namespace App\Models;
 
+use App\Services\EcheanceService;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Etudiant extends User
+class Etudiant extends Model
 {
-    use HasFactory;
-
-    protected $table = 'etudiants';
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
+        'tenant_id',
         'user_id',
-        'matricule',
+        'promotion_id',
+        'numero_etudiant',
         'date_naissance',
-        'classe_id',
+        'lieu_naissance',
+        'nationalite',
+        'actif',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'date_naissance' => 'date',
+        'actif' => 'boolean',
+    ];
+
+    protected static function booted(): void
     {
-        return [
-            'date_naissance' => 'date',
-        ];
+        static::created(function (Etudiant $etudiant) {
+            /** @var EcheanceService $service */
+            $service = app(EcheanceService::class);
+            $service->genererPourEtudiant($etudiant);
+        });
+    }
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
-    public function classe()
+    public function promotion()
     {
-        return $this->belongsTo(Classe::class, 'classe_id');
+        return $this->belongsTo(Promotion::class);
+    }
+
+    public function echeances()
+    {
+        return $this->hasMany(Echeance::class);
     }
 
     public function notes()
     {
-        return $this->hasMany(Note::class, 'etudiant_matricule', 'matricule');
+        return $this->hasMany(Note::class);
     }
 
     public function presences()
     {
-        return $this->hasMany(Presence::class, 'etudiant_matricule', 'matricule');
+        return $this->hasMany(Presence::class);
     }
 
-    public function paiements()
+    public function deliberations()
     {
-        return $this->hasMany(Paiement::class, 'etudiant_matricule', 'matricule');
+        return $this->hasMany(Deliberation::class);
+    }
+
+    public function demandes()
+    {
+        return $this->hasMany(Demande::class);
+    }
+
+    public function inscriptionsPedagogiques()
+    {
+        return $this->hasMany(InscriptionPedagogique::class);
+    }
+
+    public function cours()
+    {
+        return $this->belongsToMany(Cours::class, 'inscriptions_pedagogiques', 'etudiant_id', 'cours_id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

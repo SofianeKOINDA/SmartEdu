@@ -3,27 +3,22 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateEnseignantRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return $this->user()->can('update', $this->route('enseignant'));
+    }
 
     public function rules(): array
     {
-        $enseignant = $this->route('enseignant');
-        $userId     = $enseignant instanceof \App\Models\Enseignant ? $enseignant->user_id : null;
-
         return [
-            // Champs User
-            'nom'                  => ['sometimes', 'string', 'max:100'],
-            'prenom'               => ['sometimes', 'string', 'max:100'],
-            'email'                => ['sometimes', 'email', 'max:150', Rule::unique('users', 'email')->ignore($userId)],
-            'password'             => ['nullable', 'string', 'min:8', 'confirmed'],
-            // Champs Enseignant
-            'specialite'           => ['sometimes', 'nullable', 'string', 'max:150'],
-            'telephone'            => ['sometimes', 'nullable', 'string', 'max:20'],
-            'matricule_enseignant' => ['sometimes', 'string', 'max:50', Rule::unique('enseignants', 'matricule_enseignant')->ignore($enseignant)],
+            'departement_id' => ['nullable', 'exists:departements,id'],
+            'grade'          => ['nullable', 'string', 'max:100'],
+            'specialite'     => ['nullable', 'string', 'max:255'],
+            'bureau'         => ['nullable', 'string', 'max:100'],
+            'matricule'      => ['nullable', 'string', 'max:50'],
         ];
     }
 }

@@ -6,6 +6,28 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Dark mode basé sur la classe .dark sur <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Utilitaires supplémentaires */
+@layer utilities {
+    .bg-white\/8 {
+        background-color: rgba(255, 255, 255, .08);
+    }
+    .bg-white\/15 {
+        background-color: rgba(255, 255, 255, .15);
+    }
+    .border-white\/8 {
+        border-color: rgba(255, 255, 255, .08);
+    }
+    .w-4\.5 {
+        width: 1.125rem;
+    }
+    .h-4\.5 {
+        height: 1.125rem;
+    }
 }

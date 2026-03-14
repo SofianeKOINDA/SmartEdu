@@ -2,84 +2,105 @@
 
 namespace App\Services;
 
+use App\Models\Echeance;
+use App\Models\Etudiant;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class PayTechService
 {
     private string $apiKey;
     private string $apiSecret;
     private string $env;
-    private string $apiBase;
-    private string $currency;
+    private string $baseUrl = 'https://paytech.sn/api';
 
     public function __construct()
     {
-        $this->apiKey    = config('paytech.api_key');
-        $this->apiSecret = config('paytech.api_secret');
-        $this->env       = config('paytech.env', 'test');
-        $this->apiBase   = config('paytech.api_base');
-        $this->currency  = config('paytech.currency', 'XOF');
+        $this->apiKey    = config('services.paytech.api_key', '');
+        $this->apiSecret = config('services.paytech.api_secret', '');
+        $this->env       = config('services.paytech.env', 'test');
     }
 
     /**
-     * Initie un paiement PayTech et retourne le redirectUrl.
-     *
-     * @param  array{
-     *   item_name: string,
-     *   item_price: int,
-     *   ref_command: string,
-     *   command_name: string,
-     *   ipn_url: string,
-     *   success_url: string,
-     *   cancel_url: string,
-     *   custom_field?: array
-     * } $params
-     * @return array{success: bool, redirect_url?: string, token?: string, error?: string}
+     * Initie un paiement PayTech pour une échéance et redirige l'étudiant.
      */
-    public function initiatePayment(array $params): array
+    public function initierPaiement(Echeance $echeance, Etudiant $etudiant): string
     {
-        $payload = [
-            'item_name'    => $params['item_name'],
-            'item_price'   => (int) $params['item_price'],
-            'currency'     => $this->currency,
-            'ref_command'  => $params['ref_command'],
-            'command_name' => $params['command_name'],
-            'env'          => $this->env,
-            'ipn_url'      => $params['ipn_url'],
-            'success_url'  => $params['success_url'],
-            'cancel_url'   => $params['cancel_url'],
-        ];
+        $reference = 'ECH-' . $echeance->id . '-' . Str::upper(Str::random(8));
 
-        if (!empty($params['custom_field'])) {
-            $payload['custom_field'] = json_encode($params['custom_field']);
-        }
+        $transaction = Transaction::create([
+            'tenant_id'   => $echeance->tenant_id,
+            'echeance_id' => $echeance->id,
+            'etudiant_id' => $etudiant->id,
+            'reference'   => $reference,
+            'montant'     => $echeance->montant,
+            'statut'      => 'initie',
+        ]);
+
+        $payload = [
+            'item_name'        => 'Echéance ' . $echeance->numero_mois,
+            'item_price'       => (int) ($echeance->montant * 100),
+            'currency'         => 'XOF',
+            'ref_command'      => $reference,
+            'command_name'     => 'Paiement scolarité - Mois ' . $echeance->numero_mois,
+            'env'              => $this->env,
+            'ipn_url'          => route('webhooks.paytech'),
+            'success_url'      => route('etudiant.echeances.index'),
+            'cancel_url'       => route('etudiant.echeances.index'),
+        ];
 
         $response = Http::withHeaders([
             'API_KEY'    => $this->apiKey,
             'API_SECRET' => $this->apiSecret,
-            'Accept'     => 'application/json',
-        ])->post($this->apiBase . config('paytech.endpoint'), $payload);
+        ])->post($this->baseUrl . '/payment/request-payment', $payload);
 
-        if ($response->failed()) {
-            return [
-                'success' => false,
-                'error'   => 'Erreur de connexion PayTech : ' . $response->status(),
-            ];
+        if ($response->successful() && isset($response->json()['redirect_url'])) {
+            $redirectUrl = $response->json()['redirect_url'];
+            $token = $response->json()['token'] ?? null;
+
+            $transaction->update(['paytech_token' => $token]);
+
+            return $redirectUrl;
         }
 
-        $data = $response->json();
+        $transaction->update(['statut' => 'echec']);
 
-        if (isset($data['success']) && $data['success'] == 1 && isset($data['redirect_url'])) {
-            return [
-                'success'      => true,
-                'redirect_url' => $data['redirect_url'],
-                'token'        => $data['token'] ?? null,
-            ];
+        throw new \RuntimeException('PayTech : impossible d\'initier le paiement. ' . $response->body());
+    }
+
+    /**
+     * Traite le webhook PayTech et marque l'échéance comme payée.
+     * C'est la seule source de vérité pour confirmer un paiement.
+     */
+    public function traiterWebhook(Request $request): void
+    {
+        $refCommand = $request->input('ref_command');
+        $paytechRef = $request->input('paytech_ref');
+        $typeEvent  = $request->input('type_event');
+
+        if ($typeEvent !== 'sale_complete') {
+            return;
         }
 
-        return [
-            'success' => false,
-            'error'   => $data['errors'][0] ?? 'Erreur inconnue PayTech.',
-        ];
+        $transaction = Transaction::withoutGlobalScope('tenant')
+            ->where('reference', $refCommand)
+            ->first();
+
+        if ($transaction === null || $transaction->statut === 'succes') {
+            return;
+        }
+
+        DB::transaction(function () use ($transaction, $paytechRef) {
+            $transaction->update([
+                'statut'      => 'succes',
+                'paytech_ref' => $paytechRef,
+                'paye_le'     => now(),
+            ]);
+
+            $transaction->echeance->update(['statut' => 'paye']);
+        });
     }
 }

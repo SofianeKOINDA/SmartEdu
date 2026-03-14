@@ -2,34 +2,44 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Note extends Model
 {
-    protected $table = 'notes';
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'etudiant_matricule',
+        'tenant_id',
         'evaluation_id',
+        'etudiant_id',
+        'saisi_par',
         'valeur',
         'commentaire',
-        'semestre',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'valeur' => 'decimal:2',
-        ];
-    }
+    protected $casts = [
+        'valeur' => 'decimal:2',
+    ];
 
-    public function etudiant()
+    public function tenant()
     {
-        return $this->belongsTo(Etudiant::class, 'etudiant_matricule', 'matricule');
+        return $this->belongsTo(Tenant::class);
     }
 
     public function evaluation()
     {
-        return $this->belongsTo(Evaluation::class, 'evaluation_id');
+        return $this->belongsTo(Evaluation::class);
+    }
+
+    public function etudiant()
+    {
+        return $this->belongsTo(Etudiant::class);
+    }
+
+    public function saisiPar()
+    {
+        return $this->belongsTo(User::class, 'saisi_par');
     }
 }

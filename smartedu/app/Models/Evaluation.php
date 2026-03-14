@@ -2,36 +2,42 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Evaluation extends Model
 {
-    protected $table = 'evaluations';
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
+        'tenant_id',
         'cours_id',
-        'titre',
+        'intitule',
         'type',
-        'description',
-        'date_limite',
         'coefficient',
+        'note_max',
+        'date_evaluation',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'coefficient' => 'decimal:2',
+        'note_max' => 'decimal:2',
+        'date_evaluation' => 'date',
+    ];
+
+    public function tenant()
     {
-        return [
-            'date_limite' => 'datetime',
-            'coefficient' => 'decimal:2',
-        ];
+        return $this->belongsTo(Tenant::class);
     }
 
     public function cours()
     {
-        return $this->belongsTo(Cours::class, 'cours_id');
+        return $this->belongsTo(Cours::class);
     }
 
     public function notes()
     {
-        return $this->hasMany(Note::class, 'evaluation_id');
+        return $this->hasMany(Note::class);
     }
 }

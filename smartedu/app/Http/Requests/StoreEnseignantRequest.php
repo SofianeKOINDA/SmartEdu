@@ -6,20 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreEnseignantRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return $this->user()->can('create', \App\Models\Enseignant::class);
+    }
 
     public function rules(): array
     {
         return [
-            // Champs User
-            'nom'                  => ['required', 'string', 'max:100'],
-            'prenom'               => ['required', 'string', 'max:100'],
-            'email'                => ['required', 'email', 'max:150', 'unique:users,email'],
-            'password'             => ['required', 'string', 'min:8', 'confirmed'],
-            // Champs Enseignant
-            'specialite'           => ['nullable', 'string', 'max:150'],
-            'telephone'            => ['nullable', 'string', 'max:20'],
-            'matricule_enseignant' => ['required', 'string', 'max:50', 'unique:enseignants,matricule_enseignant'],
+            'user_id'        => ['required', 'exists:users,id'],
+            'departement_id' => ['nullable', 'exists:departements,id'],
+            'grade'          => ['nullable', 'string', 'max:100'],
+            'specialite'     => ['nullable', 'string', 'max:255'],
+            'bureau'         => ['nullable', 'string', 'max:100'],
+            'matricule'      => ['nullable', 'string', 'max:50'],
         ];
     }
 }

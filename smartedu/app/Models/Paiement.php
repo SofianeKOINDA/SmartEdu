@@ -2,32 +2,42 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Paiement extends Model
 {
-    protected $table = 'paiements';
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'etudiant_matricule',
+        'tenant_id',
+        'etudiant_id',
+        'transaction_id',
         'montant',
-        'date',
-        'statut',
-        'methode',
-        'type',
-        'paytech_token',
+        'date_paiement',
+        'mode_paiement',
+        'reference',
+        'note',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'montant' => 'decimal:2',
+        'date_paiement' => 'date',
+    ];
+
+    public function tenant()
     {
-        return [
-            'date'    => 'date',
-            'montant' => 'decimal:2',
-        ];
+        return $this->belongsTo(Tenant::class);
     }
 
     public function etudiant()
     {
-        return $this->belongsTo(Etudiant::class, 'etudiant_matricule', 'matricule');
+        return $this->belongsTo(Etudiant::class);
+    }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
     }
 }

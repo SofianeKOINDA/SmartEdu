@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Promotion;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -10,10 +12,19 @@ class EtudiantFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'        => User::factory()->etudiant(),
-            'matricule'      => 'ETU-' . fake()->unique()->numerify('####'),
-            'date_naissance' => fake()->dateTimeBetween('-25 years', '-18 years')->format('Y-m-d'),
-            'classe_id'      => null,
+            'tenant_id'         => Tenant::factory(),
+            'user_id'           => User::factory()->etudiant(),
+            'promotion_id'      => Promotion::factory(),
+            'numero_etudiant'   => strtoupper(fake()->unique()->bothify('ETU-#####')),
+            'date_naissance'    => fake()->dateTimeBetween('-30 years', '-17 years')->format('Y-m-d'),
+            'lieu_naissance'    => fake()->city(),
+            'nationalite'       => 'Sénégalaise',
+            'actif'             => true,
         ];
+    }
+
+    public function inactif(): static
+    {
+        return $this->state(fn () => ['actif' => false]);
     }
 }

@@ -1,3 +1,6 @@
 smartedu/.env
 replacements.txt
 repo.git
+cleanrepo/
+.DS_Store
+gitleaks-report.json

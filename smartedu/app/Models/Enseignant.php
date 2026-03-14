@@ -2,29 +2,41 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Enseignant extends User
+class Enseignant extends Model
 {
-    use HasFactory;
-
-    protected $table = 'enseignants';
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
+        'tenant_id',
         'user_id',
+        'departement_id',
+        'grade',
         'specialite',
-        'telephone',
-        'matricule_enseignant',
+        'bureau',
+        'matricule',
     ];
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function departement()
+    {
+        return $this->belongsTo(Departement::class);
     }
 
     public function cours()
     {
-        return $this->hasMany(Cours::class, 'enseignant_matricule', 'matricule_enseignant');
+        return $this->hasMany(Cours::class);
     }
 }

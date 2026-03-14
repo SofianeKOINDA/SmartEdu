@@ -15,9 +15,13 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 return match(Auth::user()->role) {
-                    'admin'      => redirect()->route('admin.dashboard'),
-                    'enseignant' => redirect()->route('enseignant.dashboard'),
-                    default      => redirect()->route('etudiant.dashboard'),
+                    'super_admin'      => redirect()->route('super_admin.dashboard'),
+                    'recteur'          => redirect()->route('recteur.dashboard'),
+                    'doyen'            => redirect()->route('doyen.dashboard'),
+                    'chef_departement' => redirect()->route('chef_departement.dashboard'),
+                    'enseignant',
+                    'vacataire'        => redirect()->route('enseignant.dashboard'),
+                    default            => redirect()->route('etudiant.dashboard'),
                 };
             }
         }
