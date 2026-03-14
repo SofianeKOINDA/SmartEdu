@@ -15,14 +15,12 @@ class FaculteController extends Controller
 
         $facultes = Faculte::with('departements')->paginate(20);
 
-        return view('doyen.facultes.index', compact('facultes'));
+        return view('doyen.facultes.liste', compact('facultes'));
     }
 
     public function create()
     {
-        $this->authorize('create', Faculte::class);
-
-        return view('doyen.facultes.create');
+        return redirect()->route('doyen.facultes.index');
     }
 
     public function store(StoreFaculteRequest $request)
@@ -37,16 +35,12 @@ class FaculteController extends Controller
 
     public function show(Faculte $faculte)
     {
-        $this->authorize('view', $faculte);
-
-        return view('doyen.facultes.show', compact('faculte'));
+        return redirect()->route('doyen.facultes.index');
     }
 
     public function edit(Faculte $faculte)
     {
-        $this->authorize('update', $faculte);
-
-        return view('doyen.facultes.edit', compact('faculte'));
+        return redirect()->route('doyen.facultes.index');
     }
 
     public function update(UpdateFaculteRequest $request, Faculte $faculte)

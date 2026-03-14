@@ -11,7 +11,7 @@ class EmploiDuTempsController extends Controller
     {
         $this->authorize('viewAny', Seance::class);
 
-        $etudiant = auth()->user()->etudiant;
+        $etudiant = $this->getEtudiant();
 
         $seances = Seance::with(['cours.enseignant.user'])
             ->where('promotion_id', $etudiant?->promotion_id)
@@ -19,6 +19,6 @@ class EmploiDuTempsController extends Controller
             ->orderBy('heure_debut')
             ->get();
 
-        return view('etudiant.emploi_du_temps.index', compact('seances'));
+        return view('etudiant.emploi_du_temps.liste', compact('seances'));
     }
 }

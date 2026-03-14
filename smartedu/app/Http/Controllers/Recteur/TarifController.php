@@ -14,18 +14,15 @@ class TarifController extends Controller
     {
         $this->authorize('viewAny', Tarif::class);
 
-        $tarifs = Tarif::with('anneeScolaire')->paginate(20);
+        $tarifs          = Tarif::with('anneeScolaire')->paginate(20);
+        $anneesScolaires = AnneeScolaire::all();
 
-        return view('recteur.tarifs.index', compact('tarifs'));
+        return view('recteur.tarifs.liste', compact('tarifs', 'anneesScolaires'));
     }
 
     public function create()
     {
-        $this->authorize('create', Tarif::class);
-
-        $anneesScolaires = AnneeScolaire::all();
-
-        return view('recteur.tarifs.create', compact('anneesScolaires'));
+        return redirect()->route('recteur.tarifs.index');
     }
 
     public function store(StoreTarifRequest $request)
@@ -43,16 +40,12 @@ class TarifController extends Controller
 
     public function show(Tarif $tarif)
     {
-        $this->authorize('view', $tarif);
-
-        return view('recteur.tarifs.show', compact('tarif'));
+        return redirect()->route('recteur.tarifs.index');
     }
 
     public function edit(Tarif $tarif)
     {
-        $this->authorize('update', $tarif);
-
-        return view('recteur.tarifs.edit', compact('tarif'));
+        return redirect()->route('recteur.tarifs.index');
     }
 
     public function update(UpdateTarifRequest $request, Tarif $tarif)

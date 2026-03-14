@@ -15,22 +15,21 @@ class EcheanceController extends Controller
     {
         $this->authorize('viewAny', Echeance::class);
 
-        $etudiant = auth()->user()->etudiant;
+        $etudiant = $this->getEtudiant();
 
         $echeances = Echeance::with('tarif.anneeScolaire')
             ->where('etudiant_id', $etudiant->id)
             ->orderBy('numero_mois')
             ->get();
 
-        return view('etudiant.echeances.index', compact('echeances'));
+        return view('etudiant.echeances.liste', compact('echeances'));
     }
 
     public function payer(Echeance $echeance): RedirectResponse
     {
         $this->authorize('payer', $echeance);
 
-        $etudiant = auth()->user()->etudiant;
-
+        $etudiant    = $this->getEtudiant();
         $redirectUrl = $this->payTechService->initierPaiement($echeance, $etudiant);
 
         return redirect()->away($redirectUrl);

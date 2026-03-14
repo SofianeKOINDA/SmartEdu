@@ -20,6 +20,7 @@ use App\Models\Seance;
 use App\Models\Semestre;
 use App\Models\Tarif;
 use App\Models\Tenant;
+use App\Models\Transaction;
 use App\Models\UE;
 use App\Policies\AnneeScolairePolicy;
 use App\Policies\CoursPolicy;
@@ -39,6 +40,7 @@ use App\Policies\SeancePolicy;
 use App\Policies\SemestrePolicy;
 use App\Policies\TarifPolicy;
 use App\Policies\TenantPolicy;
+use App\Policies\TransactionPolicy;
 use App\Policies\UEPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -60,8 +62,7 @@ class AuthServiceProvider extends ServiceProvider
         Note::class          => NotePolicy::class,
         Presence::class      => PresencePolicy::class,
         Tarif::class         => TarifPolicy::class,
-        Echeance::class      => EcheancePolicy::class,
-        Seance::class        => SeancePolicy::class,
+        Echeance::class      => EcheancePolicy::class,        Transaction::class    => TransactionPolicy::class,        Seance::class        => SeancePolicy::class,
         Deliberation::class  => DeliberationPolicy::class,
         Demande::class       => DemandePolicy::class,
     ];

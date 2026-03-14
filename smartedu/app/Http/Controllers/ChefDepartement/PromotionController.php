@@ -15,19 +15,16 @@ class PromotionController extends Controller
     {
         $this->authorize('viewAny', Promotion::class);
 
-        $promotions = Promotion::with(['filiere', 'anneeScolaire'])->paginate(20);
+        $promotions      = Promotion::with(['filiere', 'anneeScolaire'])->paginate(20);
+        $filieres        = Filiere::all();
+        $anneesScolaires = AnneeScolaire::all();
 
-        return view('chef_departement.promotions.index', compact('promotions'));
+        return view('chef_departement.promotions.liste', compact('promotions', 'filieres', 'anneesScolaires'));
     }
 
     public function create()
     {
-        $this->authorize('create', Promotion::class);
-
-        $filieres = Filiere::all();
-        $anneesScolaires = AnneeScolaire::all();
-
-        return view('chef_departement.promotions.create', compact('filieres', 'anneesScolaires'));
+        return redirect()->route('chef_departement.promotions.index');
     }
 
     public function store(StorePromotionRequest $request)
@@ -42,19 +39,12 @@ class PromotionController extends Controller
 
     public function show(Promotion $promotion)
     {
-        $this->authorize('view', $promotion);
-
-        return view('chef_departement.promotions.show', compact('promotion'));
+        return redirect()->route('chef_departement.promotions.index');
     }
 
     public function edit(Promotion $promotion)
     {
-        $this->authorize('update', $promotion);
-
-        $filieres = Filiere::all();
-        $anneesScolaires = AnneeScolaire::all();
-
-        return view('chef_departement.promotions.edit', compact('promotion', 'filieres', 'anneesScolaires'));
+        return redirect()->route('chef_departement.promotions.index');
     }
 
     public function update(UpdatePromotionRequest $request, Promotion $promotion)

@@ -14,16 +14,14 @@ class EvaluationController extends Controller
     {
         $this->authorize('viewAny', Evaluation::class);
 
-        $evaluations = Evaluation::where('cours_id', $cours->id)->paginate(20);
+        $evaluations = Evaluation::where('cours_id', $cours->id)->orderByDesc('created_at')->get();
 
-        return view('enseignant.evaluations.index', compact('cours', 'evaluations'));
+        return view('enseignant.evaluations.liste', compact('cours', 'evaluations'));
     }
 
     public function create(Cours $cours)
     {
-        $this->authorize('create', Evaluation::class);
-
-        return view('enseignant.evaluations.create', compact('cours'));
+        return redirect()->route('enseignant.evaluations.index', $cours);
     }
 
     public function store(StoreEvaluationRequest $request)
@@ -32,15 +30,13 @@ class EvaluationController extends Controller
 
         Evaluation::create($request->validated());
 
-        return redirect()->route('enseignant.cours.show', $request->cours_id)
+        return redirect()->route('enseignant.evaluations.index', $request->cours_id)
             ->with('success', 'Évaluation créée.');
     }
 
     public function edit(Evaluation $evaluation)
     {
-        $this->authorize('update', $evaluation);
-
-        return view('enseignant.evaluations.edit', compact('evaluation'));
+        return redirect()->route('enseignant.evaluations.index', $evaluation->cours_id);
     }
 
     public function update(UpdateEvaluationRequest $request, Evaluation $evaluation)
@@ -49,15 +45,18 @@ class EvaluationController extends Controller
 
         $evaluation->update($request->validated());
 
-        return back()->with('success', 'Évaluation mise à jour.');
+        return redirect()->route('enseignant.evaluations.index', $evaluation->cours_id)
+            ->with('success', 'Évaluation mise à jour.');
     }
 
     public function destroy(Evaluation $evaluation)
     {
         $this->authorize('delete', $evaluation);
 
+        $coursId = $evaluation->cours_id;
         $evaluation->delete();
 
-        return back()->with('success', 'Évaluation supprimée.');
+        return redirect()->route('enseignant.evaluations.index', $coursId)
+            ->with('success', 'Évaluation supprimée.');
     }
 }

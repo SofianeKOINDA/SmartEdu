@@ -15,24 +15,21 @@ class TenantController extends Controller
         $this->authorize('viewAny', Tenant::class);
 
         $tenants = Tenant::with('plan')->paginate(20);
+        $plans   = Plan::where('actif', true)->get();
 
-        return view('super_admin.tenants.index', compact('tenants'));
+        return view('super_admin.tenants.liste', compact('tenants', 'plans'));
     }
 
     public function create()
     {
-        $this->authorize('create', Tenant::class);
-
-        $plans = Plan::where('actif', true)->get();
-
-        return view('super_admin.tenants.create', compact('plans'));
+        return redirect()->route('super_admin.tenants.index');
     }
 
     public function store(StoreTenantRequest $request)
     {
         $this->authorize('create', Tenant::class);
 
-        $tenant = Tenant::create($request->validated());
+        Tenant::create($request->validated());
 
         return redirect()->route('super_admin.tenants.index')
             ->with('success', 'Université créée avec succès.');
@@ -40,18 +37,12 @@ class TenantController extends Controller
 
     public function show(Tenant $tenant)
     {
-        $this->authorize('view', $tenant);
-
-        return view('super_admin.tenants.show', compact('tenant'));
+        return redirect()->route('super_admin.tenants.index');
     }
 
     public function edit(Tenant $tenant)
     {
-        $this->authorize('update', $tenant);
-
-        $plans = Plan::where('actif', true)->get();
-
-        return view('super_admin.tenants.edit', compact('tenant', 'plans'));
+        return redirect()->route('super_admin.tenants.index');
     }
 
     public function update(UpdateTenantRequest $request, Tenant $tenant)

@@ -11,13 +11,13 @@ class CoursController extends Controller
     {
         $this->authorize('viewAny', Cours::class);
 
-        $enseignant = auth()->user()->enseignant;
+        $enseignant = $this->getEnseignant();
 
         $cours = Cours::with(['ue.semestre', 'evaluations'])
             ->where('enseignant_id', $enseignant?->id)
-            ->paginate(20);
+            ->get();
 
-        return view('enseignant.cours.index', compact('cours'));
+        return view('enseignant.cours.liste', compact('cours'));
     }
 
     public function show(Cours $cours)

@@ -7,6 +7,7 @@ use App\Http\Requests\StorePresenceRequest;
 use App\Http\Requests\UpdatePresenceRequest;
 use App\Models\Cours;
 use App\Models\Presence;
+use Illuminate\Support\Facades\Auth;
 
 class PresenceController extends Controller
 {
@@ -14,32 +15,37 @@ class PresenceController extends Controller
     {
         $this->authorize('viewAny', Presence::class);
 
+        $etudiants = $cours->etudiants()->with('user')->get();
+        $datesSeances = Presence::query()
+            ->where('cours_id', $cours->id)
+            ->select('date_seance')
+            ->distinct()
+            ->orderByDesc('date_seance')
+            ->pluck('date_seance');
+
         $presences = Presence::with('etudiant.user')
             ->where('cours_id', $cours->id)
-            ->orderBy('date_seance', 'desc')
-            ->paginate(30);
+            ->orderByDesc('date_seance')
+            ->get()
+            ->groupBy(fn (Presence $p) => $p->date_seance?->format('Y-m-d'));
 
-        return view('enseignant.presences.index', compact('cours', 'presences'));
+        return view('enseignant.presences.liste', compact('cours', 'etudiants', 'datesSeances', 'presences'));
     }
 
     public function create(Cours $cours)
     {
-        $this->authorize('create', Presence::class);
-
-        $etudiants = $cours->etudiants()->with('user')->get();
-
-        return view('enseignant.presences.create', compact('cours', 'etudiants'));
+        return redirect()->route('enseignant.presences.index', $cours);
     }
 
     public function store(StorePresenceRequest $request)
     {
         $this->authorize('create', Presence::class);
 
-        $data = array_merge($request->validated(), ['saisi_par' => auth()->id()]);
+        $data = array_merge($request->validated(), ['saisi_par' => Auth::id()]);
 
         Presence::create($data);
 
-        return redirect()->route('enseignant.cours.show', $request->cours_id)
+        return redirect()->route('enseignant.presences.index', $request->cours_id)
             ->with('success', 'Présence enregistrée.');
     }
 
@@ -49,6 +55,7 @@ class PresenceController extends Controller
 
         $presence->update($request->validated());
 
-        return back()->with('success', 'Présence mise à jour.');
+        return redirect()->route('enseignant.presences.index', $presence->cours_id)
+            ->with('success', 'Présence mise à jour.');
     }
 }
