@@ -22,4 +22,20 @@ class StoreEnseignantRequest extends FormRequest
             'matricule'      => ['nullable', 'string', 'max:50'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'user_id.required'        => 'Le champ utilisateur est obligatoire.',
+            'user_id.exists'          => 'L\'utilisateur sélectionné est invalide.',
+            'departement_id.exists'   => 'Le département sélectionné est invalide.',
+            'grade.string'           => 'Le champ grade doit être une chaîne de caractères.',
+            'grade.max'              => 'Le champ grade ne doit pas dépasser 100 caractères.',
+            'specialite.string'      => 'Le champ spécialité doit être une chaîne de caractères.',
+            'specialite.max'         => 'Le champ spécialité ne doit pas dépasser 255 caractères.',
+            'bureau.string'          => 'Le champ bureau doit être une chaîne de caractères.',
+            'bureau.max'             => 'Le champ bureau ne doit pas dépasser 100 caractères.',
+            'matricule.string'       => 'Le champ matricule doit être une chaîne de caractères.',
+            'matricule.max'          => 'Le champ matricule ne doit pas dépasser 50 caractères.',
+        ];
+    }
 }

@@ -22,8 +22,8 @@
                 <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body d-flex align-items-center">
-                            <div class="flex-shrink-0 me-3 bg-primary bg-opacity-10 rounded-circle p-3">
-                                <i class="fas fa-users fa-2x text-primary"></i>
+                            <div class="db-icon">
+                                <img src="{{ asset('templates/assets/img/icons/award-icon-04.svg') }}" >
                             </div>
                             <div>
                                 <h2 class="mb-0 fw-bold">{{ $nbPromotions }}</h2>

@@ -20,4 +20,17 @@ class StoreNoteRequest extends FormRequest
             'commentaire'   => ['nullable', 'string'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'evaluation_id.required' => 'Le champ évaluation est obligatoire.',
+            'evaluation_id.exists'   => 'L\'évaluation sélectionnée est invalide.',
+            'etudiant_id.required'   => 'Le champ étudiant est obligatoire.',
+            'etudiant_id.exists'     => 'L\'étudiant sélectionné est invalide.',
+            'valeur.required'        => 'Le champ valeur est obligatoire.',
+            'valeur.numeric'         => 'Le champ valeur doit être un nombre.',
+            'valeur.min'             => 'Le champ valeur doit être au moins 0.',
+            'commentaire.string'     => 'Le champ commentaire doit être une chaîne de caractères.',
+        ];
+    }
 }

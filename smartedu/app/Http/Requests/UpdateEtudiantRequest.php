@@ -21,4 +21,16 @@ class UpdateEtudiantRequest extends FormRequest
             'actif'          => ['boolean'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'promotion_id.exists'   => 'La promotion sélectionnée est invalide.',
+            'date_naissance.date'  => 'Le champ date de naissance doit être une date valide.',
+            'lieu_naissance.string' => 'Le champ lieu de naissance doit être une chaîne de caractères.',
+            'lieu_naissance.max'   => 'Le champ lieu de naissance ne doit pas dépasser 255 caractères.',
+            'nationalite.string'    => 'Le champ nationalité doit être une chaîne de caractères.',
+            'nationalite.max'       => 'Le champ nationalité ne doit pas dépasser 100 caractères.',
+            'actif.boolean'         => 'Le champ actif doit être un booléen.',
+        ];
+    }
 }

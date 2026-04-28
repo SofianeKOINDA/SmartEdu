@@ -47,7 +47,7 @@ class PayTechService
             'ref_command'      => $reference,
             'command_name'     => 'Paiement scolarité - Mois ' . $echeance->numero_mois,
             'env'              => $this->env,
-            'ipn_url'          => route('webhooks.paytech'),
+            'ipn_url'          => 'https://smartedu.test/api/paytech/webhook',
             'success_url'      => route('etudiant.echeances.index'),
             'cancel_url'       => route('etudiant.echeances.index'),
         ];
@@ -73,7 +73,6 @@ class PayTechService
 
     /**
      * Traite le webhook PayTech et marque l'échéance comme payée.
-     * C'est la seule source de vérité pour confirmer un paiement.
      */
     public function traiterWebhook(Request $request): void
     {

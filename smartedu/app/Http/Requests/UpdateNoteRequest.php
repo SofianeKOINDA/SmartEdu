@@ -18,4 +18,12 @@ class UpdateNoteRequest extends FormRequest
             'commentaire' => ['nullable', 'string'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'valeur.numeric' => 'Le champ valeur doit être un nombre.',
+            'valeur.min'     => 'Le champ valeur doit être au moins 0.',
+            'commentaire.string' => 'Le champ commentaire doit être une chaîne de caractères.',
+        ];
+    }
 }

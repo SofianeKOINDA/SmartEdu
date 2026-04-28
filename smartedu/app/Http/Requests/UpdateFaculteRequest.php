@@ -19,4 +19,14 @@ class UpdateFaculteRequest extends FormRequest
             'description' => ['nullable', 'string'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'nom.string'    => 'Le champ nom doit être une chaîne de caractères.',
+            'nom.max'       => 'Le champ nom ne doit pas dépasser 255 caractères.',
+            'code.string'   => 'Le champ code doit être une chaîne de caractères.',
+            'code.max'      => 'Le champ code ne doit pas dépasser 20 caractères.',
+            'description.string' => 'Le champ description doit être une chaîne de caractères.',
+        ];
+    }
 }

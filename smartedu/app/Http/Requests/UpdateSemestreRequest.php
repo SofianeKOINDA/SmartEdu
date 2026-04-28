@@ -20,4 +20,14 @@ class UpdateSemestreRequest extends FormRequest
             'actif'      => ['boolean'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'nom.string' => 'Le champ nom doit être une chaîne de caractères.',
+            'nom.max'    => 'Le champ nom ne doit pas dépasser 100 caractères.',
+            'date_debut.date' => 'Le champ date de début doit être une date valide.',
+            'date_fin.date'   => 'Le champ date de fin doit être une date valide.',
+            'actif.boolean'   => 'Le champ actif doit être un booléen.',
+        ];
+    }
 }

@@ -18,4 +18,5 @@ class UpdatePresenceRequest extends FormRequest
             'observation' => ['nullable', 'string'],
         ];
     }
+   
 }

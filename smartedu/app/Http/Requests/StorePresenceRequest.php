@@ -21,4 +21,14 @@ class StorePresenceRequest extends FormRequest
             'observation' => ['nullable', 'string'],
         ];
     }
+    public function messages()
+    {
+        return [
+            'cours_id.required' => 'Le champ cours est obligatoire.',
+            'etudiant_id.required' => 'Le champ étudiant est obligatoire.',
+            'date_seance.required' => 'Le champ date de séance est obligatoire.',
+            'statut.required' => 'Le champ statut est obligatoire.',
+            'statut.in' => 'Le champ statut doit être l\'un des suivants : present, absent, retard, excuse.',
+        ];
+    }
 }

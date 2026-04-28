@@ -19,4 +19,14 @@ class UpdateDepartementRequest extends FormRequest
             'code'       => ['nullable', 'string', 'max:20'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'faculte_id.exists' => 'La faculté sélectionnée est invalide.',
+            'nom.string'        => 'Le champ nom doit être une chaîne de caractères.',
+            'nom.max'           => 'Le champ nom ne doit pas dépasser 255 caractères.',
+            'code.string'       => 'Le champ code doit être une chaîne de caractères.',
+            'code.max'          => 'Le champ code ne doit pas dépasser 20 caractères.',
+        ];
+    }
 }

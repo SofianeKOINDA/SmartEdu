@@ -20,4 +20,16 @@ class UpdateCoursRequest extends FormRequest
             'volume_horaire' => ['sometimes', 'integer', 'min:0'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'enseignant_id.exists'   => 'L\'enseignant sélectionné est invalide.',
+            'intitule.string'        => 'Le champ intitulé doit être une chaîne de caractères.',
+            'intitule.max'           => 'Le champ intitulé ne doit pas dépasser 255 caractères.',
+            'coefficient.numeric'    => 'Le champ coefficient doit être un nombre.',
+            'coefficient.min'        => 'Le champ coefficient doit être au moins 0.',
+            'volume_horaire.integer' => 'Le champ volume horaire doit être un entier.',
+            'volume_horaire.min'     => 'Le champ volume horaire doit être au moins 0.',
+        ];
+    }
 }

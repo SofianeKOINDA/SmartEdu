@@ -20,4 +20,15 @@ class UpdatePromotionRequest extends FormRequest
             'niveau'            => ['sometimes', 'integer', 'min:1'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'filiere_id.exists' => 'La filière sélectionnée est invalide.',
+            'annee_scolaire_id.exists' => 'L\'année scolaire sélectionnée est invalide.',
+            'nom.string'        => 'Le champ nom doit être une chaîne de caractères.',
+            'nom.max'           => 'Le champ nom ne doit pas dépasser 255 caractères.',
+            'niveau.integer'    => 'Le champ niveau doit être un entier.',
+            'niveau.min'        => 'Le champ niveau doit être au moins 1.',
+        ];
+    }
 }

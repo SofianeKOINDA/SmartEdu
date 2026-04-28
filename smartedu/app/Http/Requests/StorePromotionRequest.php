@@ -20,4 +20,10 @@ class StorePromotionRequest extends FormRequest
             'niveau'             => ['required', 'integer', 'min:1'],
         ];
     }
+    public function messages()
+    {
+        return [
+            'filiere_id.required' => ''
+        ];
+    }
 }

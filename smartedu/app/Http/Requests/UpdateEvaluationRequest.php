@@ -21,4 +21,17 @@ class UpdateEvaluationRequest extends FormRequest
             'date_evaluation' => ['nullable', 'date'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'intitule.string'          => 'Le champ intitulé doit être une chaîne de caractères.',
+            'intitule.max'             => 'Le champ intitulé ne doit pas dépasser 255 caractères.',
+            'type.in'                  => 'Le champ type doit être l\'un des suivants : devoir, examen, tp, projet, autre.',
+            'coefficient.numeric'      => 'Le champ coefficient doit être un nombre.',
+            'coefficient.min'          => 'Le champ coefficient doit être au moins 0.',
+            'note_max.numeric'         => 'Le champ note max doit être un nombre.',
+            'note_max.min'             => 'Le champ note max doit être au moins 1.',
+            'date_evaluation.date'     => 'Le champ date d\'évaluation doit être une date valide.',
+        ];
+    }
 }
